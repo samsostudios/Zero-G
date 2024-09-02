@@ -7,7 +7,9 @@
     "paths": {
       "$utils/*": ["src/utils/*"],
       "$motion/*": ["src/motion/*"],
-      "$pages/*": ["src/pages"]
+      "$pages/*": ["src/pages/*"],
+      "$sComponents/*": ["src/components/static/*"],
+      "$gComponents/*": ["src/components/global/*"],
     }
   }
 }
