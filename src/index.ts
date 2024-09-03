@@ -4,6 +4,10 @@ window.Webflow ||= [];
 window.Webflow.push(() => {
   console.log('/// mainJS ///');
 
+  document.addEventListener('click', (e) => {
+    console.log('YO', e.target);
+  });
+
   // Global Components
   // ----------------
   function initComponent(selector: string, importModule: () => Promise<{ default: () => void }>) {
@@ -17,6 +21,7 @@ window.Webflow.push(() => {
 
   initComponent('.section_safety', () => import('$gComponents/safetyRecord'));
   initComponent('.section_seen', () => import('$gComponents/seenOn'));
+  initComponent('.section_faq', () => import('$gComponents/faq'));
 
   // Page Routing
   // ------------
