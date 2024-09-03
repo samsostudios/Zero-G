@@ -2,7 +2,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 export const safetyRecord = () => {
-  console.log('SAFETY');
+  console.log('Safety - COMP');
 
   gsap.registerPlugin(ScrollTrigger);
 

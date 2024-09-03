@@ -1,5 +1,4 @@
 // import { safetyRecord } from '$gComponents/safetyRecord';
-import { home } from '$pages/home';
 
 window.Webflow ||= [];
 window.Webflow.push(() => {
@@ -17,6 +16,7 @@ window.Webflow.push(() => {
   }
 
   initComponent('.section_safety', () => import('$gComponents/safetyRecord'));
+  initComponent('.section_seen', () => import('$gComponents/seenOn'));
 
   // Page Routing
   // ------------
