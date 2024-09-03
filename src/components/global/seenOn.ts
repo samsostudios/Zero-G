@@ -52,7 +52,7 @@ export const seenOn = () => {
     }
   }
 
-  new InfiniteSlider('.seen_slider-track', '.seen_wrap', 5);
+  new InfiniteSlider('.seen_slider-track', '.seen_wrap', 15);
 };
 
 export default seenOn;
