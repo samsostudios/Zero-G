@@ -23,6 +23,7 @@ window.Webflow.push(() => {
   initComponent('.section_safety', () => import('$gComponents/safetyRecord'));
   initComponent('.section_seen', () => import('$gComponents/seenOn'));
   initComponent('.section_faq', () => import('$gComponents/faq'));
+  initComponent('.section_testimonials', () => import('$gComponents/testimonials'));
 
   // Page Routing
   // ------------
