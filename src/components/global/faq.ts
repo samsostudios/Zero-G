@@ -16,7 +16,6 @@ export const faq = () => {
       this.faqItems.forEach((item) => {
         const question = item.querySelector('.faq_item-q') as HTMLElement;
         const answer = item.querySelector('.faq_item-a') as HTMLElement;
-        console.log('HERE', item, question, answer);
 
         gsap.set(answer, { height: 0, overflow: 'hidden' });
 
