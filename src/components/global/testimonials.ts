@@ -16,7 +16,7 @@ export const testimonialsSlider = () => {
       this.uiIndicators = document.querySelectorAll('.s-ui_item');
       this.currentIndex = 0;
       this.intervalTime = parseInt(this.testimonialsList.dataset.slideSpeed as string) * 1000;
-      console.log('HERE', this.intervalTime);
+
       //   this.intervalTime = 10000; // 10 seconds
       this.init();
     }

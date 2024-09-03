@@ -33,7 +33,7 @@ export const nav = () => {
         onEnter: () => this.animateNavBgIn(),
         onLeaveBack: () => this.animateNavBgOut(),
         // onUpdate: (self) => this.handleScroll(self.progress),
-        markers: true,
+        // markers: true,
       });
     }
 
@@ -44,14 +44,6 @@ export const nav = () => {
     private animateNavBgOut(): void {
       gsap.to(this.navBg, { y: '-100%', opacity: 0, duration: 1, ease: this.easeFloat });
     }
-
-    // private handleScroll(progress: number): void {
-    //   if (progress > 0.25) {
-    //     gsap.to(this.navBg, { scaleX: 1, duration: 1, ease: 'power1.out' });
-    //   } else {
-    //     gsap.to(this.navBg, { scaleX: 0, duration: 1, ease: 'power1.out' });
-    //   }
-    // }
   }
 
   new Nav();
