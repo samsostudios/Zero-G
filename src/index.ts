@@ -1,4 +1,5 @@
 // import { safetyRecord } from '$gComponents/safetyRecord';
+import { schedule } from '$pages/schedule';
 
 window.Webflow ||= [];
 window.Webflow.push(() => {
@@ -22,8 +23,8 @@ window.Webflow.push(() => {
   initComponent('.nav_component', () => import('$gComponents/nav'));
   initComponent('.section_safety', () => import('$gComponents/safetyRecord'));
   initComponent('.section_seen', () => import('$gComponents/seenOn'));
-  initComponent('.section_faq', () => import('$gComponents/faq'));
-  initComponent('.section_testimonials', () => import('$gComponents/testimonials'));
+  // initComponent('.section_faq', () => import('$gComponents/faq'));
+  // initComponent('.section_testimonials', () => import('$gComponents/testimonials'));
   initComponent('.section_img-slider', () => import('$gComponents/imageSlider'));
 
   // Page Routing
@@ -35,6 +36,8 @@ window.Webflow.push(() => {
       import('./pages/home').then((module) => {
         module.home();
       });
+    } else if (pathname === '/flight-schedule') {
+      schedule();
     }
   }
 
