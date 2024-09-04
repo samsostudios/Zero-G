@@ -19,6 +19,10 @@ export const flightSchedule = () => {
       time: string;
       limitedSeats: boolean;
       soldOut: boolean;
+      type: string;
+      color: string;
+      price: string;
+      link: string;
     }[];
     private sortedFlightData: {
       month: string;
@@ -29,6 +33,10 @@ export const flightSchedule = () => {
         time: string;
         limitedSeats: boolean;
         soldOut: boolean;
+        type: string;
+        color: string;
+        price: string;
+        link: string;
       }[];
     }[];
     private renderHeight: number;
@@ -53,24 +61,18 @@ export const flightSchedule = () => {
 
     // initialize
     private init() {
-      // Show loadscreen
       this.showLoadingAnimation();
-      // Call parse data on feed
-      this.parsedFlightData = this.parseData(this.flightData);
-      //   console.log('Data', this.parsedFlightData);
 
+      this.parsedFlightData = this.parseData(this.flightData);
       this.sortedFlightData = this.sortFlights();
-      //   console.log('Sorted', this.sortedFlightData);
 
       const templates = document.querySelector('.sl_templates');
       gsap.set(templates, { display: 'none' });
 
-      //   this.renderUpdates();
-      //   this.hideLoadingAnimation();
       setTimeout(() => {
         this.renderUpdates();
         this.hideLoadingAnimation();
-        this.addModalCloseEvent();
+        // this.addModalCloseEvent();
       }, 2000);
     }
 
@@ -82,6 +84,10 @@ export const flightSchedule = () => {
         const time = item.querySelector('.sl_d-time')?.textContent?.trim() || '';
         const limitedSeatsElement = item.querySelector('.sl_d-limited');
         const soldOutElement = item.querySelector('.sl_d-sold');
+        const type = item.querySelector('.sl_d-type')?.textContent?.trim() || '';
+        const price = item.querySelector('.sl_d-price')?.textContent?.trim() || '';
+        const colorElement = item.querySelector('.sl_d-color') as HTMLElement;
+        const link = this.formatRowLink(location);
 
         const limitedSeats =
           limitedSeatsElement && !limitedSeatsElement.classList.contains('w-condition-invisible')
@@ -93,16 +99,84 @@ export const flightSchedule = () => {
             ? true
             : false;
 
+        const color = colorElement.style.backgroundColor as string;
+
         return {
           location,
           date,
           time,
           limitedSeats,
           soldOut,
+          type,
+          color,
+          price,
+          link,
         };
       });
 
       return flightArray;
+    }
+
+    //format link text
+    private formatRowLink(text: string) {
+      const stateAbbreviations: { [key: string]: string } = {
+        AL: 'alabama',
+        AK: 'alaska',
+        AZ: 'arizona',
+        AR: 'arkansas',
+        CA: 'california',
+        CO: 'colorado',
+        CT: 'connecticut',
+        DE: 'delaware',
+        FL: 'florida',
+        GA: 'georgia',
+        HI: 'hawaii',
+        ID: 'idaho',
+        IL: 'illinois',
+        IN: 'indiana',
+        IA: 'iowa',
+        KS: 'kansas',
+        KY: 'kentucky',
+        LA: 'louisiana',
+        ME: 'maine',
+        MD: 'maryland',
+        MA: 'massachusetts',
+        MI: 'michigan',
+        MN: 'minnesota',
+        MS: 'mississippi',
+        MO: 'missouri',
+        MT: 'montana',
+        NE: 'nebraska',
+        NV: 'nevada',
+        NH: 'new-hampshire',
+        NJ: 'new-jersey',
+        NM: 'new-mexico',
+        NY: 'new-york',
+        NC: 'north-carolina',
+        ND: 'north-dakota',
+        OH: 'ohio',
+        OK: 'oklahoma',
+        OR: 'oregon',
+        PA: 'pennsylvania',
+        RI: 'rhode-island',
+        SC: 'south-carolina',
+        SD: 'south-dakota',
+        TN: 'tennessee',
+        TX: 'texas',
+        UT: 'utah',
+        VT: 'vermont',
+        VA: 'virginia',
+        WA: 'washington',
+        WV: 'west-virginia',
+        WI: 'wisconsin',
+        WY: 'wyoming',
+      };
+
+      const [city, stateAbbr] = text.split(', ');
+      const formattedCity = city.toLowerCase().replace(/\s+/g, '-');
+      const formattedState = stateAbbreviations[stateAbbr.toUpperCase()] || stateAbbr.toLowerCase();
+
+      return `/flight-locations/${formattedCity}-${formattedState}`;
     }
 
     // Sort parsed data by month
@@ -116,8 +190,14 @@ export const flightSchedule = () => {
           time: string;
           limitedSeats: boolean;
           soldOut: boolean;
+          type: string;
+          color: string;
+          price: string;
+          link: string;
         }[];
       }[] = [];
+
+      console.log('HERE', this.parsedFlightData);
 
       this.parsedFlightData.forEach((flight) => {
         const dateObj = new Date(flight.date);
@@ -143,9 +223,8 @@ export const flightSchedule = () => {
 
     //Calc height of new schedule object
     private calculateRenderHeight(blocks: HTMLElement[]) {
-      console.log('calculate', blocks);
-
-      this.renderHeight = 0;
+      const setPad = 96;
+      this.renderHeight = setPad;
 
       blocks.forEach((item) => {
         item.style.position = 'aboslute';
@@ -155,15 +234,11 @@ export const flightSchedule = () => {
         this.renderHeight += item.clientHeight;
 
         item.remove();
-
-        // console.log('ADDED', item.clientHeight);
-        // console.log('CALC', calcHeight);
       });
     }
 
     // Create new flight head
     private createHead(month: string, year: string) {
-      //   console.log('Create Head----------------');
       const head = this.headTemplate.cloneNode(true) as HTMLElement;
       head.classList.remove('head-template');
       const headMonth = head.querySelector('.sl_head-month');
@@ -171,8 +246,6 @@ export const flightSchedule = () => {
 
       if (headMonth) headMonth.textContent = month;
       if (headYear) headYear.textContent = year;
-
-      //   console.log('HEAD', head);
 
       return head;
     }
@@ -184,6 +257,10 @@ export const flightSchedule = () => {
       time: string;
       limitedSeats: boolean;
       soldOut: boolean;
+      type: string;
+      color: string;
+      price: string;
+      link: string;
     }) {
       const row = this.rowTemplate.cloneNode(true) as HTMLElement;
       row.classList.remove('row-template');
@@ -191,17 +268,27 @@ export const flightSchedule = () => {
       const locationElement = row.querySelector('.sl_row-location');
       const dateElement = row.querySelector('.sl_row-date');
       const timeElement = row.querySelector('.sl_row-time');
-      const limitedSeatsElement = row.querySelector('.sl_tag.ls') as HTMLElement;
-      const soldOutElement = row.querySelector('.sl_tag.so') as HTMLElement;
+      const limitedSeatsElement = row.querySelector('.sl_tag.is-ls') as HTMLElement;
+      const soldOutElement = row.querySelector('.sl_tag.is-so') as HTMLElement;
+      const typeElement = row.querySelector('.sl_row-type') as HTMLElement;
+      const colorElement = row.querySelector('.sl_row-glyph') as HTMLElement;
+      const priceElement = row.querySelector('.sl_row-price') as HTMLElement;
 
       if (locationElement) locationElement.textContent = flight.location;
       if (dateElement) dateElement.textContent = flight.date;
       if (timeElement) timeElement.textContent = flight.time;
+      // debug
       if (limitedSeatsElement)
         limitedSeatsElement.style.display = flight.limitedSeats ? 'block' : 'none';
       if (soldOutElement) soldOutElement.style.display = flight.soldOut ? 'block' : 'none';
 
-      row.addEventListener('click', () => this.openModal());
+      if (typeElement) typeElement.textContent = flight.type;
+      if (colorElement) colorElement.style.backgroundColor = flight.color;
+      if (priceElement) priceElement.textContent = flight.price;
+
+      row.addEventListener('click', () => {
+        window.location.href = flight.link;
+      });
 
       return row;
     }
@@ -216,6 +303,10 @@ export const flightSchedule = () => {
         time: string;
         limitedSeats: boolean;
         soldOut: boolean;
+        type: string;
+        color: string;
+        price: string;
+        link: string;
       }[];
     }) {
       const block = this.blockTemplate.cloneNode(true) as HTMLElement;
