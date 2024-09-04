@@ -23,8 +23,8 @@ window.Webflow.push(() => {
   initComponent('.nav_component', () => import('$gComponents/nav'));
   initComponent('.section_safety', () => import('$gComponents/safetyRecord'));
   initComponent('.section_seen', () => import('$gComponents/seenOn'));
-  // initComponent('.section_faq', () => import('$gComponents/faq'));
-  // initComponent('.section_testimonials', () => import('$gComponents/testimonials'));
+  initComponent('.section_faq', () => import('$gComponents/faq'));
+  initComponent('.section_testimonials', () => import('$gComponents/testimonials'));
   initComponent('.section_img-slider', () => import('$gComponents/imageSlider'));
 
   // Page Routing

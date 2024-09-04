@@ -1,9 +1,14 @@
 import { gsap } from 'gsap';
+import { CustomEase } from 'gsap/CustomEase';
+
+gsap.registerPlugin(CustomEase);
 
 export const flightSchedule = () => {
   console.log('Flight Schedule - COMP');
 
   class FlightSchedule {
+    private scheduleMain: HTMLElement;
+    private flightsWrap: HTMLElement;
     private blockTemplate: HTMLElement;
     private headTemplate: HTMLElement;
     private rowTemplate: HTMLElement;
@@ -26,8 +31,12 @@ export const flightSchedule = () => {
         soldOut: boolean;
       }[];
     }[];
+    private renderHeight: number;
+    private easeFloat: any;
 
     constructor() {
+      this.scheduleMain = document.querySelector('.schedule_main') as HTMLElement;
+      this.flightsWrap = document.querySelector('.schedule_main') as HTMLElement;
       this.blockTemplate = document.querySelector('.block-template') as HTMLElement;
       this.headTemplate = document.querySelector('.head-template') as HTMLElement;
       this.rowTemplate = document.querySelector('.row-template') as HTMLElement;
@@ -36,6 +45,8 @@ export const flightSchedule = () => {
       ];
       this.parsedFlightData = [];
       this.sortedFlightData = [];
+      this.renderHeight = 0;
+      this.easeFloat = CustomEase.create('floatDown', 'M0,0 C0.25,0.1 0.25,1 1,1');
 
       this.init();
     }
@@ -51,12 +62,16 @@ export const flightSchedule = () => {
       this.sortedFlightData = this.sortFlights();
       //   console.log('Sorted', this.sortedFlightData);
 
+      const templates = document.querySelector('.sl_templates');
+      gsap.set(templates, { display: 'none' });
+
       //   this.renderUpdates();
       //   this.hideLoadingAnimation();
       setTimeout(() => {
         this.renderUpdates();
         this.hideLoadingAnimation();
-      }, 1000);
+        this.addModalCloseEvent();
+      }, 2000);
     }
 
     // Parse flight data from html feed
@@ -88,35 +103,6 @@ export const flightSchedule = () => {
       });
 
       return flightArray;
-    }
-
-    // Show loading animation
-    private showLoadingAnimation() {
-      const loadingElement = document.querySelector('.schedule_loader');
-
-      if (loadingElement) {
-        // GSAP animation
-        gsap.to(loadingElement, {
-          duration: 1,
-          opacity: 1,
-          ease: 'power4.inOut',
-        });
-      }
-    }
-
-    // Hide loading animation
-    private hideLoadingAnimation() {
-      const loadingElement = document.querySelector('.schedule_loader');
-      if (loadingElement) {
-        // GSAP fade out and remove element
-        gsap.to(loadingElement, {
-          duration: 0.5,
-          opacity: 0,
-          onComplete: () => {
-            gsap.set(loadingElement, { display: 'none' });
-          },
-        });
-      }
     }
 
     // Sort parsed data by month
@@ -153,6 +139,26 @@ export const flightSchedule = () => {
       });
 
       return groupedFlights;
+    }
+
+    //Calc height of new schedule object
+    private calculateRenderHeight(blocks: HTMLElement[]) {
+      console.log('calculate', blocks);
+
+      this.renderHeight = 0;
+
+      blocks.forEach((item) => {
+        item.style.position = 'aboslute';
+        item.style.left = '-9999px';
+        document.body.appendChild(item);
+
+        this.renderHeight += item.clientHeight;
+
+        item.remove();
+
+        // console.log('ADDED', item.clientHeight);
+        // console.log('CALC', calcHeight);
+      });
     }
 
     // Create new flight head
@@ -195,17 +201,9 @@ export const flightSchedule = () => {
         limitedSeatsElement.style.display = flight.limitedSeats ? 'block' : 'none';
       if (soldOutElement) soldOutElement.style.display = flight.soldOut ? 'block' : 'none';
 
-      //   console.log('ROW', row);
+      row.addEventListener('click', () => this.openModal());
 
       return row;
-    }
-
-    private calculateRenderHeight(blocks: HTMLElement[]) {
-      console.log('calculate', blocks);
-
-      blocks.forEach((item) => {
-        console.log('CALC', item);
-      });
     }
 
     // Create new flightBlock
@@ -234,23 +232,103 @@ export const flightSchedule = () => {
       return block;
     }
 
+    // Add event listener to close modal
+    private addModalCloseEvent() {
+      const modal = document.querySelector('.section_rez');
+      if (modal) {
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) {
+            // Only close if clicking outside the content
+            this.closeModal();
+          }
+        });
+      }
+    }
+
     // Render Updates to DOM
     private renderUpdates() {
-      const flightMain = document.querySelector('.schedule_main');
-      if (!flightMain) return;
-
       const blocks = this.sortedFlightData
         .map((group) => this.createFlightBlock(group))
         .filter((block) => block !== null);
 
       this.calculateRenderHeight(blocks);
 
-      //   const estimatedHeight = blocks.length * 200;
-      //   console.log('render', blocks, estimatedHeight, window.innerHeight);
-
-      blocks.forEach((block) => {
-        // if (block) flightMain.appendChild(block);
+      gsap.to(this.scheduleMain, {
+        duration: 1,
+        height: this.renderHeight,
+        ease: 'power3.inOut',
       });
+
+      this.revealBlock(blocks);
+    }
+
+    //Reveal schedule elements
+    private revealBlock(blocks: HTMLElement[]) {
+      if (!this.scheduleMain) return;
+      if (!this.flightsWrap) return;
+
+      blocks.forEach((item) => {
+        if (item) {
+          this.flightsWrap.appendChild(item);
+          gsap.fromTo(
+            item,
+            { y: '1rem', opacity: 0 },
+            { delay: 0.2, y: 0, opacity: 1, ease: this.easeFloat }
+          );
+        }
+      });
+    }
+
+    // Show loading animation
+    private showLoadingAnimation() {
+      const loadingWrap = document.querySelector('.schedule_loader-wrap');
+      const loadingElement = document.querySelector('.schedule_loader');
+      if (loadingElement) gsap.set(loadingWrap, { display: 'flex' });
+      if (loadingWrap)
+        gsap.fromTo(
+          loadingElement,
+          { y: '1rem', opacity: 0 },
+          { y: '0rem', opacity: 1, ease: this.easeFloat }
+        );
+    }
+
+    // Hide loading animation
+    private hideLoadingAnimation() {
+      const loadingElement = document.querySelector('.schedule_loader');
+      if (loadingElement) {
+        gsap.to(loadingElement, {
+          y: '-1rem',
+          opacity: 0,
+          ease: this.easeFloat,
+          onComplete: () => {
+            gsap.set(loadingElement, { display: 'none' });
+          },
+        });
+      }
+    }
+
+    // Open modal function triggered by row click
+    private openModal() {
+      const modal = document.querySelector('.section_rez');
+      if (modal) {
+        gsap.set(modal, { display: 'flex' });
+        gsap.fromTo(modal, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1 });
+      }
+    }
+
+    // Close modal function triggered by clicking on modal
+    private closeModal() {
+      const modal = document.querySelector('.section_rez');
+      if (modal) {
+        gsap.to(modal, {
+          opacity: 0,
+          scale: 0.8,
+          duration: 0.5,
+          onComplete: () => {
+            gsap.set(modal, { display: 'none' });
+          },
+        });
+      }
     }
   }
 
