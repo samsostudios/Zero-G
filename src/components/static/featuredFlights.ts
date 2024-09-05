@@ -1,4 +1,7 @@
 import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 export const featuredFlights = () => {
   class FeaturedFlights {
@@ -38,11 +41,11 @@ export const featuredFlights = () => {
       this.tabletBreakpoint = '(max-width: 991px)';
 
       if (this.currentType) this.currentType.classList.add('is-active');
-      if (this.currentVideo) this.currentVideo.play();
+      // if (this.currentVideo) this.currentVideo.play();
 
       this.initializeImages();
       this.setFlightTypeDataAttributes();
-
+      this.setupScrollTrigger();
       this.setupEventListeners();
       window.addEventListener('resize', this.setupEventListeners.bind(this));
     }
@@ -219,6 +222,28 @@ export const featuredFlights = () => {
       this.currentMedia = targetMedia;
       this.currentDescription = targetDescription;
       this.currentIndex = targetIndex;
+    }
+
+    private setupScrollTrigger() {
+      const section = document.querySelector('.section_home-flights');
+      ScrollTrigger.create({
+        trigger: section,
+        start: 'top bottom',
+        end: 'bottom top',
+        markers: true,
+        onEnter: () => {
+          if (this.currentVideo) this.currentVideo.play();
+        },
+        onLeave: () => {
+          if (this.currentVideo) this.currentVideo.pause();
+        },
+        onEnterBack: () => {
+          if (this.currentVideo) this.currentVideo.play();
+        },
+        onLeaveBack: () => {
+          if (this.currentVideo) this.currentVideo.pause();
+        },
+      });
     }
   }
 
