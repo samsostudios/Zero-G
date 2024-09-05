@@ -287,9 +287,8 @@ export const flightSchedule = () => {
       const colorElement = row.querySelector('.sl_row-glyph') as HTMLElement;
       const priceElement = row.querySelector('.sl_row-price') as HTMLElement;
       const linkElement = row as HTMLAnchorElement;
-      // const test = linkElement.href;
 
-      console.log('ROW', flight);
+      // console.log('ROW', flight);
 
       if (locationElement) locationElement.textContent = flight.location;
       if (dateElement) dateElement.textContent = flight.date;
@@ -303,11 +302,6 @@ export const flightSchedule = () => {
       if (colorElement) colorElement.style.backgroundColor = flight.color;
       if (priceElement) priceElement.textContent = flight.price;
       if (linkElement) linkElement.href = flight.link;
-
-      // row.addEventListener('click', () => {
-      //   console.log('LINK', flight.link);
-      //   // window.location.href = flight.link;
-      // });
 
       return row;
     }
