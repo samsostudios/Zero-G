@@ -26,6 +26,7 @@ window.Webflow.push(() => {
   initComponent('.section_faq', () => import('$gComponents/faq'));
   initComponent('.section_testimonials', () => import('$gComponents/testimonials'));
   initComponent('.section_img-slider', () => import('$gComponents/imageSlider'));
+  initComponent('.section_hs-form', () => import('$gComponents/hubspotForm'));
 
   // Page Routing
   // ------------

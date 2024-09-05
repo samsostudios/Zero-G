@@ -14,7 +14,6 @@ export const imageSlider = () => {
       this.images = document.querySelectorAll('.img-slider_img-wrap');
       this.totalWidth = 0;
       this.slideDuration = parseInt(this.imagesContainer.dataset.slideSpeed as string) * 10;
-      console.log('yo', this.slideDuration);
 
       this.tl = gsap.timeline({ repeat: -1, yoyo: true });
 
@@ -25,6 +24,8 @@ export const imageSlider = () => {
     private setupImages() {
       this.imagesContainer.style.display = 'flex';
       this.imagesContainer.style.flexWrap = 'nowrap';
+      this.imagesContainer.style.flexShrink = '0';
+      this.imagesContainer.style.flexGrow = '1';
 
       let maxWidth = window.innerWidth * 0.3;
 

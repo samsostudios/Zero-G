@@ -103,12 +103,13 @@ export const featuredFlights = () => {
       const targetDescription = this.fdList[targetIndex];
 
       if (targetImage && targetImage !== this.currentImage) {
-        this.animateImageChange(targetImage, targetDescription, targetIndex);
+        // this.animateImageChange(targetImage, targetDescription, targetIndex);
       }
     }
 
     private animateImageChange(
       targetImage: HTMLImageElement,
+      targetVideo: HTMLVideoElement,
       targetDescription: HTMLElement,
       targetIndex: number
     ) {
@@ -121,6 +122,8 @@ export const featuredFlights = () => {
       }
 
       const targetFiImage = targetImage.querySelector('.fi_image') as HTMLImageElement;
+      const targetFiVideo = targetImage.querySelector('.fi_video') as HTMLImageElement;
+      targetVideo = targetFiVideo.querySelector('video') as HTMLVideoElement;
 
       // Animate the current image out of view
       this.activeImageAnimation = gsap.to(this.currentImage, {
@@ -146,6 +149,7 @@ export const featuredFlights = () => {
       });
 
       // Animate the target image into view
+      console.log('HERE', targetImage);
       this.activeImageAnimation = gsap.fromTo(
         targetImage,
         { y: '100%', opacity: 1, zIndex: '2' },
@@ -157,6 +161,7 @@ export const featuredFlights = () => {
           ease: 'power3.inOut',
           onComplete: () => {
             targetImage.style.zIndex = '2';
+            targetVideo.play();
           },
         }
       );

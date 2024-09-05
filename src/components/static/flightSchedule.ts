@@ -79,15 +79,23 @@ export const flightSchedule = () => {
     // Parse flight data from html feed
     private parseData(data: HTMLElement[]) {
       const flightArray = data.map((item) => {
-        const location = item.querySelector('.sl_d-location')?.textContent?.trim() || '';
+        let location = item.querySelector('.sl_d-location')?.textContent?.trim() || '';
         const date = item.querySelector('.sl_d-date')?.textContent?.trim() || '';
         const time = item.querySelector('.sl_d-time')?.textContent?.trim() || '';
+        // const linkLocaion = location;
         const limitedSeatsElement = item.querySelector('.sl_d-limited');
         const soldOutElement = item.querySelector('.sl_d-sold');
         const type = item.querySelector('.sl_d-type')?.textContent?.trim() || '';
         const price = item.querySelector('.sl_d-price')?.textContent?.trim() || '';
         const colorElement = item.querySelector('.sl_d-color') as HTMLElement;
-        const link = this.formatRowLink(location);
+
+        let link = '#';
+
+        if (location !== '') {
+          link = this.formatRowLink(location);
+        } else {
+          location = 'To Be Determined';
+        }
 
         const limitedSeats =
           limitedSeatsElement && !limitedSeatsElement.classList.contains('w-condition-invisible')
@@ -100,6 +108,8 @@ export const flightSchedule = () => {
             : false;
 
         const color = colorElement.style.backgroundColor as string;
+
+        console.log('HERE', link);
 
         return {
           location,
@@ -174,7 +184,10 @@ export const flightSchedule = () => {
 
       const [city, stateAbbr] = text.split(', ');
       const formattedCity = city.toLowerCase().replace(/\s+/g, '-');
-      const formattedState = stateAbbreviations[stateAbbr.toUpperCase()] || stateAbbr.toLowerCase();
+      const formattedState =
+        stateAbbr && stateAbbreviations[stateAbbr.toUpperCase()]
+          ? stateAbbreviations[stateAbbr.toUpperCase()]
+          : stateAbbr.toLowerCase();
 
       return `/flight-locations/${formattedCity}-${formattedState}`;
     }
@@ -273,6 +286,10 @@ export const flightSchedule = () => {
       const typeElement = row.querySelector('.sl_row-type') as HTMLElement;
       const colorElement = row.querySelector('.sl_row-glyph') as HTMLElement;
       const priceElement = row.querySelector('.sl_row-price') as HTMLElement;
+      const linkElement = row as HTMLAnchorElement;
+      // const test = linkElement.href;
+
+      console.log('ROW', flight);
 
       if (locationElement) locationElement.textContent = flight.location;
       if (dateElement) dateElement.textContent = flight.date;
@@ -285,10 +302,12 @@ export const flightSchedule = () => {
       if (typeElement) typeElement.textContent = flight.type;
       if (colorElement) colorElement.style.backgroundColor = flight.color;
       if (priceElement) priceElement.textContent = flight.price;
+      if (linkElement) linkElement.href = flight.link;
 
-      row.addEventListener('click', () => {
-        window.location.href = flight.link;
-      });
+      // row.addEventListener('click', () => {
+      //   console.log('LINK', flight.link);
+      //   // window.location.href = flight.link;
+      // });
 
       return row;
     }
