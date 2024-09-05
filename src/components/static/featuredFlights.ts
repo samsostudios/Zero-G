@@ -3,25 +3,42 @@ import { gsap } from 'gsap';
 export const featuredFlights = () => {
   class FeaturedFlights {
     private typeList: HTMLElement[];
+    private mediaList: HTMLElement[];
     private imgList: HTMLImageElement[];
+    private vidList: HTMLVideoElement[];
     private fdList: HTMLElement[];
-    private currentImage: HTMLImageElement;
+    private currentType: HTMLElement;
+    private currentMedia: HTMLElement;
+    private currentDescription: HTMLElement;
+    private currentVideo: HTMLVideoElement;
     private currentIndex: number;
     private tabletBreakpoint: string;
-    private activeImageAnimation?: gsap.core.Tween;
+    private activeMediaAnimation?: gsap.core.Tween;
     private activeDescriptionAnimation?: gsap.core.Tween;
 
     constructor() {
       this.typeList = [...document.querySelectorAll('.ft_item')].map((item) => item as HTMLElement);
-      this.imgList = [...document.querySelectorAll('.fi_item')].map(
+      this.mediaList = [...document.querySelectorAll('.fi_item')].map(
+        (item) => item as HTMLElement
+      );
+      this.imgList = [...document.querySelectorAll('.fi_item .fi_image')].map(
         (item) => item as HTMLImageElement
+      );
+      this.vidList = [...document.querySelectorAll('.fi_item .fi_video')].map(
+        (item) => item as HTMLVideoElement
       );
       this.fdList = Array.from(document.querySelectorAll('.fd_item')).map(
         (item) => item as HTMLElement
       );
-      this.currentImage = this.imgList[0] as HTMLImageElement;
+      this.currentType = this.typeList[0] as HTMLElement;
+      this.currentMedia = this.mediaList[0] as HTMLElement;
+      this.currentDescription = this.fdList[0] as HTMLElement;
+      this.currentVideo = this.vidList[0].querySelector('video') as HTMLVideoElement;
       this.currentIndex = 0;
       this.tabletBreakpoint = '(max-width: 991px)';
+
+      if (this.currentType) this.currentType.classList.add('is-active');
+      if (this.currentVideo) this.currentVideo.play();
 
       this.initializeImages();
       this.setFlightTypeDataAttributes();
@@ -31,7 +48,7 @@ export const featuredFlights = () => {
     }
 
     private initializeImages() {
-      this.imgList.forEach((img, index) => {
+      this.mediaList.forEach((img, index) => {
         if (index !== 0) {
           img.style.opacity = '0';
           img.style.transform = 'translateY(100%)';
@@ -56,10 +73,9 @@ export const featuredFlights = () => {
         const flightType = item.querySelector('h3')?.textContent?.toLowerCase();
         if (flightType) {
           const slug = this.convertToSlug(flightType);
-          this.imgList[index].dataset.flightType = flightType;
+          this.mediaList[index].dataset.flightType = flightType;
           this.fdList[index].dataset.flightType = flightType;
 
-          // Set the link for the button inside the fd_item
           const button = this.fdList[index].querySelector('a') as HTMLAnchorElement;
           if (button) {
             button.href = `/${slug}`;
@@ -76,82 +92,77 @@ export const featuredFlights = () => {
     }
 
     private setupEventListeners() {
-      // Remove any existing event listeners
       this.typeList.forEach((item) => {
-        item.removeEventListener('mouseenter', this.handleInteraction);
         item.removeEventListener('click', this.handleInteraction);
       });
 
-      if (window.matchMedia(this.tabletBreakpoint).matches) {
-        // If on tablet or below, use click event
-        this.typeList.forEach((item) => {
-          item.addEventListener('click', this.handleInteraction.bind(this));
-        });
-      } else {
-        // If above tablet breakpoint, use hover event
-        this.typeList.forEach((item) => {
-          item.addEventListener('mouseenter', this.handleInteraction.bind(this));
-        });
-      }
+      this.typeList.forEach((item) => {
+        item.addEventListener('click', this.handleInteraction.bind(this));
+      });
+
+      // if (window.matchMedia(this.tabletBreakpoint).matches) {
+      //   // If on tablet or below, use click event
+      //   this.typeList.forEach((item) => {
+      //     item.addEventListener('click', this.handleInteraction.bind(this));
+      //   });
+      // } else {
+      //   // If above tablet breakpoint, use hover event
+      //   this.typeList.forEach((item) => {
+      //     item.addEventListener('mouseenter', this.handleInteraction.bind(this));
+      //   });
+      // }
     }
 
     private handleInteraction(event: Event) {
-      const item = event.currentTarget as HTMLElement;
-      const flightType = item.querySelector('h3')?.textContent?.toLowerCase() as string;
-      const targetIndex = this.imgList.findIndex((img) => img.dataset.flightType === flightType);
-      const targetImage = this.imgList[targetIndex];
+      const clickedItem = event.currentTarget as HTMLElement;
+      const flightType = clickedItem.querySelector('h3')?.textContent?.toLowerCase() as string;
+      const targetIndex = this.mediaList.findIndex((img) => img.dataset.flightType === flightType);
+      const targetType = this.typeList[targetIndex];
+      const targetMedia = this.mediaList[targetIndex];
       const targetDescription = this.fdList[targetIndex];
 
-      if (targetImage && targetImage !== this.currentImage) {
-        // this.animateImageChange(targetImage, targetDescription, targetIndex);
+      if (targetMedia && targetMedia !== this.currentMedia) {
+        this.animateChange(targetType, targetMedia, targetDescription, targetIndex);
       }
     }
 
-    private animateImageChange(
-      targetImage: HTMLImageElement,
-      targetVideo: HTMLVideoElement,
+    private animateChange(
+      targetType: HTMLElement,
+      targetMedia: HTMLElement,
       targetDescription: HTMLElement,
       targetIndex: number
     ) {
       // Kill any ongoing animations before starting a new one
-      if (this.activeImageAnimation) {
-        this.activeImageAnimation.kill();
+      if (this.activeMediaAnimation) {
+        this.activeMediaAnimation.kill();
       }
       if (this.activeDescriptionAnimation) {
         this.activeDescriptionAnimation.kill();
       }
 
-      const targetFiImage = targetImage.querySelector('.fi_image') as HTMLImageElement;
-      const targetFiVideo = targetImage.querySelector('.fi_video') as HTMLImageElement;
-      targetVideo = targetFiVideo.querySelector('video') as HTMLVideoElement;
+      const targetFiImage = targetMedia.querySelector('.fi_image') as HTMLImageElement;
+      const targetFiVideo = targetMedia.querySelector('video') as HTMLVideoElement;
 
-      // Animate the current image out of view
-      this.activeImageAnimation = gsap.to(this.currentImage, {
+      // Animate Type List Container
+      this.currentType.classList.remove('is-active');
+      targetType.classList.add('is-active');
+
+      // Animate Media Container
+      // Current - Out
+      this.activeMediaAnimation = gsap.to(this.currentMedia, {
         y: '-100%',
         duration: 0.7,
         ease: 'power3.inOut',
         onComplete: () => {
-          this.currentImage.style.opacity = '0';
-          this.currentImage.style.zIndex = '1';
-          this.currentImage.style.transform = 'translateY(100%)';
+          this.currentVideo.pause();
+          this.currentMedia.style.opacity = '0';
+          this.currentMedia.style.zIndex = '1';
+          this.currentMedia.style.transform = 'translateY(100%)';
         },
       });
-
-      // Fade out the current description
-      const currentDescription = this.fdList[this.currentIndex];
-      this.activeDescriptionAnimation = gsap.to(currentDescription, {
-        opacity: 0,
-        duration: 0.7,
-        ease: 'power2.inOut',
-        onComplete: () => {
-          currentDescription.style.zIndex = '1';
-        },
-      });
-
-      // Animate the target image into view
-      console.log('HERE', targetImage);
-      this.activeImageAnimation = gsap.fromTo(
-        targetImage,
+      // Next - In
+      this.activeMediaAnimation = gsap.fromTo(
+        targetMedia,
         { y: '100%', opacity: 1, zIndex: '2' },
         {
           duration: 0.7,
@@ -160,13 +171,23 @@ export const featuredFlights = () => {
           scale: 1,
           ease: 'power3.inOut',
           onComplete: () => {
-            targetImage.style.zIndex = '2';
-            targetVideo.play();
+            targetMedia.style.zIndex = '2';
+            targetFiVideo.play();
           },
         }
       );
 
-      // Fade in the target description
+      // Animate Description Container
+      // Current - Out
+      this.activeDescriptionAnimation = gsap.to(this.currentDescription, {
+        opacity: 0,
+        duration: 0.7,
+        ease: 'power2.inOut',
+        onComplete: () => {
+          this.currentDescription.style.zIndex = '1';
+        },
+      });
+      // Next - In
       this.activeDescriptionAnimation = gsap.to(targetDescription, {
         opacity: 1,
         duration: 0.7,
@@ -176,7 +197,7 @@ export const featuredFlights = () => {
         },
       });
 
-      // Add scale effect to the .fi_image element if it exists
+      // Add scale effect to the image
       if (targetFiImage) {
         gsap.fromTo(
           targetFiImage,
@@ -184,9 +205,18 @@ export const featuredFlights = () => {
           { scale: 1, duration: 0.7, ease: 'power3.inOut' }
         );
       }
+      if (targetFiVideo) {
+        gsap.fromTo(
+          targetFiVideo,
+          { scale: 1.4 },
+          { scale: 1, duration: 0.7, ease: 'power3.inOut' }
+        );
+      }
 
       // Update the current image and index
-      this.currentImage = targetImage;
+      this.currentType = targetType;
+      this.currentMedia = targetMedia;
+      this.currentDescription = targetDescription;
       this.currentIndex = targetIndex;
     }
   }
