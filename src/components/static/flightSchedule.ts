@@ -109,8 +109,6 @@ export const flightSchedule = () => {
 
         const color = colorElement.style.backgroundColor as string;
 
-        console.log('HERE', link);
-
         return {
           location,
           date,
@@ -210,8 +208,6 @@ export const flightSchedule = () => {
         }[];
       }[] = [];
 
-      console.log('HERE', this.parsedFlightData);
-
       this.parsedFlightData.forEach((flight) => {
         const dateObj = new Date(flight.date);
         const month = dateObj.toLocaleString('default', { month: 'long' });
@@ -275,6 +271,11 @@ export const flightSchedule = () => {
       price: string;
       link: string;
     }) {
+      if (!this.rowTemplate) {
+        console.log('WARN // Missing Row Template Tag');
+        return;
+      }
+
       const row = this.rowTemplate.cloneNode(true) as HTMLElement;
       row.classList.remove('row-template');
 
@@ -330,7 +331,7 @@ export const flightSchedule = () => {
 
       group.flights.forEach((flight) => {
         const row = this.createRow(flight);
-        block.appendChild(row);
+        if (row) block.appendChild(row);
       });
 
       return block;
