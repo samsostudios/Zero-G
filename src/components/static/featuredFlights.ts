@@ -179,12 +179,13 @@ export const featuredFlights = () => {
 
       // Animate Description Container
       // Current - Out
-      this.activeDescriptionAnimation = gsap.to(this.currentDescription, {
+      const curDescription = this.currentDescription;
+      this.activeDescriptionAnimation = gsap.to(curDescription, {
         opacity: 0,
         duration: 0.7,
         ease: 'power2.inOut',
         onComplete: () => {
-          this.currentDescription.style.zIndex = '1';
+          curDescription.style.zIndex = '1';
         },
       });
       // Next - In
