@@ -10,12 +10,15 @@ export const featuredFlights = () => {
     private imgList: HTMLImageElement[];
     private vidList: HTMLVideoElement[];
     private fdList: HTMLElement[];
+
     private currentType: HTMLElement;
     private currentMedia: HTMLElement;
     private currentDescription: HTMLElement;
     private currentVideo: HTMLVideoElement;
+    private descriptionHeight: number;
     private currentIndex: number;
     private tabletBreakpoint: string;
+
     private activeMediaAnimation?: gsap.core.Tween;
     private activeDescriptionAnimation?: gsap.core.Tween;
 
@@ -39,36 +42,53 @@ export const featuredFlights = () => {
       this.currentVideo = this.vidList[0].querySelector('video') as HTMLVideoElement;
       this.currentIndex = 0;
       this.tabletBreakpoint = '(max-width: 991px)';
+      this.descriptionHeight = 0;
 
       if (this.currentType) this.currentType.classList.add('is-active');
       // if (this.currentVideo) this.currentVideo.play();
 
-      this.initializeImages();
+      this.init();
       this.setFlightTypeDataAttributes();
       this.setupScrollTrigger();
       this.setupEventListeners();
       window.addEventListener('resize', this.setupEventListeners.bind(this));
     }
 
-    private initializeImages() {
-      this.mediaList.forEach((img, index) => {
+    private init() {
+      let maxHeight = this.descriptionHeight;
+      this.mediaList.forEach((item, index) => {
         if (index !== 0) {
-          img.style.opacity = '0';
-          img.style.transform = 'translateY(100%)';
-          img.style.zIndex = '1';
+          item.style.opacity = '0';
+          item.style.transform = 'translateY(100%)';
+          item.style.zIndex = '1';
         } else {
-          img.style.zIndex = '2';
+          item.style.zIndex = '2';
         }
       });
 
-      this.fdList.forEach((desc, index) => {
+      this.fdList.forEach((item, index) => {
+        const getHeight = item.clientHeight;
+        if (getHeight > maxHeight) {
+          maxHeight = getHeight;
+          console.log('MAX I', item);
+        }
+
         if (index !== 0) {
-          desc.style.opacity = '0';
-          desc.style.zIndex = '1';
+          item.style.opacity = '0';
+          item.style.zIndex = '1';
         } else {
-          desc.style.zIndex = '2';
+          item.style.zIndex = '2';
         }
       });
+
+      this.descriptionHeight = maxHeight;
+    }
+
+    private handleDescriptionSizing() {
+      const descriptionList = document.querySelector('.fd_list');
+      console.log('MAX', this.descriptionHeight);
+      gsap.to(descriptionList, { height: this.descriptionHeight });
+      this.descriptionHeight = this.descriptionHeight;
     }
 
     private setFlightTypeDataAttributes() {
