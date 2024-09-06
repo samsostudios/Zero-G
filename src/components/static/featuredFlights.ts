@@ -45,9 +45,9 @@ export const featuredFlights = () => {
       this.descriptionHeight = 0;
 
       if (this.currentType) this.currentType.classList.add('is-active');
-      // if (this.currentVideo) this.currentVideo.play();
 
       this.init();
+      this.handleDescriptionSizing();
       this.setFlightTypeDataAttributes();
       this.setupScrollTrigger();
       this.setupEventListeners();
@@ -55,7 +55,6 @@ export const featuredFlights = () => {
     }
 
     private init() {
-      let maxHeight = this.descriptionHeight;
       this.mediaList.forEach((item, index) => {
         if (index !== 0) {
           item.style.opacity = '0';
@@ -67,12 +66,6 @@ export const featuredFlights = () => {
       });
 
       this.fdList.forEach((item, index) => {
-        const getHeight = item.clientHeight;
-        if (getHeight > maxHeight) {
-          maxHeight = getHeight;
-          console.log('MAX I', item);
-        }
-
         if (index !== 0) {
           item.style.opacity = '0';
           item.style.zIndex = '1';
@@ -80,15 +73,34 @@ export const featuredFlights = () => {
           item.style.zIndex = '2';
         }
       });
-
-      this.descriptionHeight = maxHeight;
     }
 
     private handleDescriptionSizing() {
       const descriptionList = document.querySelector('.fd_list');
-      console.log('MAX', this.descriptionHeight);
-      gsap.to(descriptionList, { height: this.descriptionHeight });
-      this.descriptionHeight = this.descriptionHeight;
+
+      const setDescriptionHeight = () => {
+        const descriptionHeight = this.getDescriptionSize();
+        gsap.to(descriptionList, { height: descriptionHeight });
+        this.descriptionHeight = descriptionHeight;
+      };
+
+      setDescriptionHeight();
+
+      window.addEventListener('resize', () => {
+        setDescriptionHeight();
+      });
+    }
+
+    private getDescriptionSize() {
+      let maxHeight = 0;
+      this.fdList.forEach((item) => {
+        const getHeight = item.clientHeight;
+        if (getHeight > maxHeight) {
+          maxHeight = getHeight;
+        }
+      });
+
+      return maxHeight;
     }
 
     private setFlightTypeDataAttributes() {
