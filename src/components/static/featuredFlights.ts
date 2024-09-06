@@ -262,7 +262,7 @@ export const featuredFlights = () => {
         trigger: section,
         start: 'top bottom',
         end: 'bottom top',
-        markers: true,
+        // markers: true,
         onEnter: () => {
           if (this.currentVideo) this.currentVideo.play();
         },

@@ -16,7 +16,7 @@ export const revealVideo = (trigger: HTMLElement, videos: HTMLElement[]) => {
         trigger: this.triggerElement,
         start: '-10% bottom',
         end: 'bottom top',
-        markers: true,
+        // markers: true,
         onEnter: () => {
           this.videoElements.forEach((item) => {
             const video = item as HTMLVideoElement;
