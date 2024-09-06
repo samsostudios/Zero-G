@@ -17,28 +17,35 @@ export const imageSlider = () => {
 
       this.tl = gsap.timeline({ repeat: -1, yoyo: true });
 
+      console.log('before', this.imagesContainer);
+      console.log('before', this.imagesContainer.clientWidth);
+      // this.imagesContainer.style.width = '150vw';
+      // gsap.to(this.imagesContainer, { width: '150vw' });
+      console.log('afyer', this.imagesContainer.clientWidth);
+
+      this.imagesContainer.style.width = '150vw';
+      this.imagesContainer.style.display = 'flex';
+      // gsap.to(this.imagesContainer, { width: '150vw' });
+
       this.setupImages();
       this.initAnimation();
     }
 
     private setupImages() {
-      this.imagesContainer.style.display = 'flex';
-      this.imagesContainer.style.flexWrap = 'nowrap';
-      this.imagesContainer.style.flexShrink = '0';
-      this.imagesContainer.style.flexGrow = '1';
-
       let maxWidth = window.innerWidth * 0.3;
 
       // Webflow Mobile Portrait breakpoint (767px)
       if (window.innerWidth <= 767) {
         console.log('MOB');
-        maxWidth = window.innerWidth * 0.8;
+        maxWidth = window.innerWidth * 0.5;
       }
 
       this.images.forEach((image) => {
-        // image.style.flexShrink = '0';
+        image.style.flexShrink = '0';
+        image.style.flexGrow = '1';
         image.style.width = `${maxWidth}px`;
         image.style.height = 'auto';
+        console.log('offset', image.offsetWidth);
         this.totalWidth += image.offsetWidth;
       });
 
@@ -48,7 +55,8 @@ export const imageSlider = () => {
 
     private initAnimation() {
       const duration = this.totalWidth / 100; // Adjust the speed of the animation
-      console.log('HER', duration);
+
+      console.log('here', this.totalWidth, window.innerWidth, this.totalWidth - window.innerWidth);
 
       this.tl.to(this.imagesContainer, {
         x: `-${this.totalWidth - window.innerWidth}px`, // Move left until the last image is at the edge

@@ -1,5 +1,5 @@
 export const pricing = () => {
-  console.log('priving');
+  console.log('Pricing - COMP');
   class Pricing {
     private pricingTags: HTMLElement[];
 

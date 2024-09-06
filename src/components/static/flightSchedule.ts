@@ -94,7 +94,7 @@ export const flightSchedule = () => {
         if (location !== '') {
           link = this.formatRowLink(location);
         } else {
-          location = 'To Be Determined';
+          location = 'Location - TBD';
         }
 
         const limitedSeats =
@@ -301,6 +301,9 @@ export const flightSchedule = () => {
 
       if (typeElement) typeElement.textContent = flight.type;
       if (colorElement) colorElement.style.backgroundColor = flight.color;
+      flight.color
+        ? (colorElement.style.backgroundColor = flight.color)
+        : (colorElement.style.backgroundColor = 'transparent');
       if (priceElement) priceElement.textContent = flight.price;
       if (linkElement) linkElement.href = flight.link;
 
