@@ -27,7 +27,7 @@ export const nav = () => {
 
       ScrollTrigger.create({
         trigger: this.heroElement,
-        start: 'top+=25% top ',
+        start: 'top+=10% top ',
         end: 'top top',
         scrub: true,
         onEnter: () => this.animateNavBgIn(),
@@ -38,11 +38,11 @@ export const nav = () => {
     }
 
     private animateNavBgIn(): void {
-      gsap.to(this.navBg, { y: '0%', opacity: 1, duration: 1, ease: this.easeFloat });
+      gsap.to(this.navBg, { y: '0%', opacity: 1, duration: 1, ease: 'power3.out' });
     }
 
     private animateNavBgOut(): void {
-      gsap.to(this.navBg, { y: '-100%', opacity: 0, duration: 1, ease: this.easeFloat });
+      gsap.to(this.navBg, { y: '-100%', opacity: 0, duration: 1, ease: 'power3.in' });
     }
   }
 

@@ -3,13 +3,15 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-export const featuredFlights = () => {
-  class FeaturedFlights {
+export const selectSlider = () => {
+  class SelectSlider {
     private typeList: HTMLElement[];
     private mediaList: HTMLElement[];
-    private imgList: HTMLImageElement[];
+    // private imgList: HTMLImageElement[];
     private vidList: HTMLVideoElement[];
     private fdList: HTMLElement[];
+    private modalList: HTMLElement[];
+    private modalLinks: HTMLElement[];
 
     private currentType: HTMLElement;
     private currentMedia: HTMLElement;
@@ -19,42 +21,55 @@ export const featuredFlights = () => {
     private currentIndex: number;
     private tabletBreakpoint: string;
 
+    private modal: HTMLElement;
+
     private activeMediaAnimation?: gsap.core.Tween;
     private activeDescriptionAnimation?: gsap.core.Tween;
 
     constructor() {
-      this.typeList = [...document.querySelectorAll('.ft_item')].map((item) => item as HTMLElement);
-      this.mediaList = [...document.querySelectorAll('.fi_item')].map(
+      this.typeList = [...document.querySelectorAll('[data-slide-toggle]')].map(
         (item) => item as HTMLElement
       );
-      this.imgList = [...document.querySelectorAll('.fi_item .fi_image')].map(
-        (item) => item as HTMLImageElement
+      this.mediaList = [...document.querySelectorAll('[data-slide-media]')].map(
+        (item) => item as HTMLElement
       );
-      this.vidList = [...document.querySelectorAll('.fi_item .fi_video')].map(
+      // this.imgList = [...document.querySelectorAll('.fi_item .fi_image')].map(
+      //   (item) => item as HTMLImageElement
+      // );
+      this.vidList = [...document.querySelectorAll('[data-slide-video]')].map(
         (item) => item as HTMLVideoElement
       );
-      this.fdList = Array.from(document.querySelectorAll('.fd_item')).map(
+      this.fdList = [...document.querySelectorAll('[data-slide-description]')].map(
         (item) => item as HTMLElement
       );
+      this.modalList = [...document.querySelectorAll('[data-slide-modal]')].map(
+        (item) => item as HTMLElement
+      );
+      this.modalLinks = [...document.querySelectorAll('[data-modal-link]')].map(
+        (item) => item as HTMLElement
+      );
+
       this.currentType = this.typeList[0] as HTMLElement;
       this.currentMedia = this.mediaList[0] as HTMLElement;
       this.currentDescription = this.fdList[0] as HTMLElement;
-      this.currentVideo = this.vidList[0].querySelector('video') as HTMLVideoElement;
+      this.currentVideo = this.vidList[0].querySelector('.video-main') as HTMLVideoElement;
       this.currentIndex = 0;
       this.tabletBreakpoint = '(max-width: 991px)';
       this.descriptionHeight = 0;
 
+      this.modal = document.querySelector('.section_modal') as HTMLElement;
+
       if (this.currentType) this.currentType.classList.add('is-active');
 
-      this.init();
-      this.handleDescriptionSizing();
-      this.setFlightTypeDataAttributes();
+      this.initializeMedia();
+      if (this.fdList.length !== 0) this.handleDescriptionSizing();
+      this.setMediaDataAttributes();
       this.setupScrollTrigger();
       this.setupEventListeners();
       window.addEventListener('resize', this.setupEventListeners.bind(this));
     }
 
-    private init() {
+    private initializeMedia() {
       this.mediaList.forEach((item, index) => {
         if (index !== 0) {
           item.style.opacity = '0';
@@ -103,17 +118,28 @@ export const featuredFlights = () => {
       return maxHeight;
     }
 
-    private setFlightTypeDataAttributes() {
+    private setMediaDataAttributes() {
       this.typeList.forEach((item, index) => {
-        const flightType = item.querySelector('h3')?.textContent?.toLowerCase();
-        if (flightType) {
-          const slug = this.convertToSlug(flightType);
-          this.mediaList[index].dataset.flightType = flightType;
-          this.fdList[index].dataset.flightType = flightType;
+        const slideTag = item.querySelector('[data-slide-tag]')?.textContent?.toLowerCase();
 
-          const button = this.fdList[index].querySelector('a') as HTMLAnchorElement;
-          if (button) {
-            button.href = `/${slug}`;
+        if (slideTag) {
+          const slug = this.convertToSlug(slideTag);
+          this.mediaList[index].dataset.matchTag = slideTag;
+
+          if (this.fdList.length !== 0) {
+            this.fdList[index].dataset.matchTag = slideTag;
+
+            const button = this.fdList[index].querySelector('a') as HTMLAnchorElement;
+            if (button) {
+              button.href = `/${slug}`;
+            }
+          }
+
+          if (this.modalList.length !== 0) {
+            this.modalList[index].dataset.matchTag = slideTag;
+          }
+          if (this.modalLinks.length !== 0) {
+            this.modalLinks[index].dataset.matchTag = slideTag;
           }
         }
       });
@@ -135,6 +161,14 @@ export const featuredFlights = () => {
         item.addEventListener('click', this.handleInteraction.bind(this));
       });
 
+      this.modalLinks.forEach((item) => {
+        item.addEventListener('click', (e) => {
+          this.showModal();
+        });
+      });
+
+      if (this.modal) this.modal.addEventListener('click', this.closeModal.bind(this));
+
       // if (window.matchMedia(this.tabletBreakpoint).matches) {
       //   // If on tablet or below, use click event
       //   this.typeList.forEach((item) => {
@@ -150,14 +184,22 @@ export const featuredFlights = () => {
 
     private handleInteraction(event: Event) {
       const clickedItem = event.currentTarget as HTMLElement;
-      const flightType = clickedItem.querySelector('h3')?.textContent?.toLowerCase() as string;
-      const targetIndex = this.mediaList.findIndex((img) => img.dataset.flightType === flightType);
+      const slideTag = clickedItem
+        .querySelector('[data-slide-tag]')
+        ?.textContent?.toLowerCase() as string;
+
+      const targetIndex = this.mediaList.findIndex((img) => img.dataset.matchTag === slideTag);
       const targetType = this.typeList[targetIndex];
       const targetMedia = this.mediaList[targetIndex];
+      const targetModal = this.modalList[targetIndex];
       const targetDescription = this.fdList[targetIndex];
 
       if (targetMedia && targetMedia !== this.currentMedia) {
         this.animateChange(targetType, targetMedia, targetDescription, targetIndex);
+      }
+
+      if (targetModal) {
+        gsap.to(targetModal, { opacity: 1, display: 'block' });
       }
     }
 
@@ -175,8 +217,10 @@ export const featuredFlights = () => {
         this.activeDescriptionAnimation.kill();
       }
 
-      const targetFiImage = targetMedia.querySelector('.fi_image') as HTMLImageElement;
-      const targetFiVideo = targetMedia.querySelector('video') as HTMLVideoElement;
+      // const targetFiImage = targetMedia.querySelector('.fi_image') as HTMLImageElement;
+      const targetFiVideo = targetMedia.querySelector('.video-main') as HTMLVideoElement;
+
+      console.log('ANIMATE', targetFiVideo);
 
       // Animate Type List Container
       this.currentType.classList.remove('is-active');
@@ -207,40 +251,51 @@ export const featuredFlights = () => {
           ease: 'power3.inOut',
           onComplete: () => {
             targetMedia.style.zIndex = '2';
-            targetFiVideo.play();
+            const playPromise = targetFiVideo.play();
+            if (playPromise !== undefined) {
+              playPromise
+                .then((_) => {
+                  // targetFiVideo.pause();
+                })
+                .catch((error) => {
+                  console.log('Play Error:', error);
+                });
+            }
           },
         }
       );
 
       // Animate Description Container
-      // Current - Out
-      const curDescription = this.currentDescription;
-      this.activeDescriptionAnimation = gsap.to(curDescription, {
-        opacity: 0,
-        duration: 0.7,
-        ease: 'power2.inOut',
-        onComplete: () => {
-          curDescription.style.zIndex = '1';
-        },
-      });
-      // Next - In
-      this.activeDescriptionAnimation = gsap.to(targetDescription, {
-        opacity: 1,
-        duration: 0.7,
-        ease: 'power2.inOut',
-        onStart: () => {
-          targetDescription.style.zIndex = '2';
-        },
-      });
-
-      // Add scale effect to the image
-      if (targetFiImage) {
-        gsap.fromTo(
-          targetFiImage,
-          { scale: 1.4 },
-          { scale: 1, duration: 0.7, ease: 'power3.inOut' }
-        );
+      if (targetDescription) {
+        // Current - Out
+        const curDescription = this.currentDescription;
+        this.activeDescriptionAnimation = gsap.to(curDescription, {
+          opacity: 0,
+          duration: 0.7,
+          ease: 'power2.inOut',
+          onComplete: () => {
+            curDescription.style.zIndex = '1';
+          },
+        });
+        // Next - In
+        this.activeDescriptionAnimation = gsap.to(targetDescription, {
+          opacity: 1,
+          duration: 0.7,
+          ease: 'power2.inOut',
+          onStart: () => {
+            targetDescription.style.zIndex = '2';
+          },
+        });
       }
+
+      // Add scale effect to the image /video
+      // if (targetFiImage) {
+      //   gsap.fromTo(
+      //     targetFiImage,
+      //     { scale: 1.4 },
+      //     { scale: 1, duration: 0.7, ease: 'power3.inOut' }
+      //   );
+      // }
       if (targetFiVideo) {
         gsap.fromTo(
           targetFiVideo,
@@ -277,7 +332,24 @@ export const featuredFlights = () => {
         },
       });
     }
+
+    private showModal() {
+      gsap.set(this.modal, { display: 'flex' });
+      gsap.fromTo(this.modal, { opacity: 0 }, { opacity: 1, ease: 'power3.out' });
+    }
+
+    private closeModal() {
+      gsap.to(this.modal, {
+        opacity: 0,
+        duration: 0.5,
+        ease: 'power3.out',
+        onComplete: () => {
+          gsap.set(this.modal, { display: 'none' });
+        },
+      });
+    }
   }
 
-  new FeaturedFlights();
+  new SelectSlider();
 };
+export default selectSlider;

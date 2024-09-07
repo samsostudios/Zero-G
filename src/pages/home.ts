@@ -1,11 +1,11 @@
 import { blogSlider } from '$sComponents/blogSlider';
-import { featuredFlights } from '$sComponents/featuredFlights';
+// import { featuredFlights } from '$sComponents/featuredFlights';
 import { revealVideo } from '$utils/revealVideos';
 
 export const home = () => {
   console.log('/home');
 
-  featuredFlights();
+  // featuredFlights();
   blogSlider();
 
   // hero

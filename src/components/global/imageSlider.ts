@@ -32,7 +32,8 @@ export const imageSlider = () => {
     }
 
     private setupImages() {
-      let maxWidth = window.innerWidth * 0.3;
+      let maxWidth = window.innerWidth * 0.1;
+      console.log('max', maxWidth);
 
       // Webflow Mobile Portrait breakpoint (767px)
       if (window.innerWidth <= 767) {
