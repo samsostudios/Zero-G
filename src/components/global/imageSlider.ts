@@ -25,14 +25,14 @@ export const imageSlider = () => {
 
       this.imagesContainer.style.width = '150vw';
       this.imagesContainer.style.display = 'flex';
-      // gsap.to(this.imagesContainer, { width: '150vw' });
+      gsap.to(this.imagesContainer, { width: '150vw' });
 
       this.setupImages();
       this.initAnimation();
     }
 
     private setupImages() {
-      let maxWidth = window.innerWidth * 0.1;
+      let maxWidth = window.innerWidth * 0.2;
       console.log('max', maxWidth);
 
       // Webflow Mobile Portrait breakpoint (767px)
