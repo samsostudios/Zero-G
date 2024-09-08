@@ -30,15 +30,15 @@ export const mediaPlayer = () => {
           item.addEventListener('mouseleave', () => this.animateOut(video, stroke));
         }
 
-        item.addEventListener('click', (item) => {
-          const clicked = item.target as HTMLVideoElement;
-          const clickedSrc = clicked.src;
+        // item.addEventListener('click', (item) => {
+        //   const clicked = item.target as HTMLVideoElement;
+        //   const clickedSrc = clicked.src;
 
-          video.pause();
-          if (clickedSrc) if (this.modal) this.modalVideo.src = clickedSrc;
+        //   video.pause();
+        //   if (clickedSrc) if (this.modal) this.modalVideo.src = clickedSrc;
 
-          this.showModal();
-        });
+        //   this.showModal();
+        // });
 
         this.modal.addEventListener('click', () => {
           this.modalVideo.src = '';
