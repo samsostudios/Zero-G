@@ -298,11 +298,13 @@ export const flightSchedule = () => {
       };
 
       const [city, stateAbbr] = text.split(', ');
-      const formattedCity = city.toLowerCase().replace(/\s+/g, '-');
+      const formattedCity = city.toLowerCase().replace(/\s+/g, '-').replace(/\//g, '-');
       const formattedState =
         stateAbbr && stateAbbreviations[stateAbbr.toUpperCase()]
           ? stateAbbreviations[stateAbbr.toUpperCase()]
           : stateAbbr.toLowerCase();
+
+      // console.log('!!!!', formattedCity, formattedState);
 
       return `/flight-locations/${formattedCity}-${formattedState}`;
     }
@@ -417,6 +419,7 @@ export const flightSchedule = () => {
       const colorElement = row.querySelector('.sl_row-glyph') as HTMLElement;
       const priceElement = row.querySelector('.sl_row-price') as HTMLElement;
       const linkElement = row as HTMLAnchorElement;
+      const buttonElement = row.querySelector('.sl_button-wrap') as HTMLElement;
 
       // console.log('ROW', flight);
 
@@ -434,7 +437,18 @@ export const flightSchedule = () => {
         ? (colorElement.style.backgroundColor = flight.color)
         : (colorElement.style.backgroundColor = 'transparent');
       if (priceElement) priceElement.textContent = flight.price;
-      if (linkElement) linkElement.href = flight.link;
+
+      console.log(flight.link);
+      if (flight.link === '#') this.hideButton(buttonElement);
+
+      if (linkElement) {
+        if (flight.link !== '#') {
+          if (flight.type === 'Public Flights') linkElement.href = flight.link;
+          else if (flight.type === 'Private Flights') linkElement.href = '/private-flight-bookings';
+          else if (flight.type === 'Research Flights')
+            linkElement.href = '/research-flight-bookings';
+        }
+      }
 
       return row;
     }
@@ -469,6 +483,10 @@ export const flightSchedule = () => {
       return block;
     }
 
+    // Hide button if no link present
+    private hideButton(btn: HTMLElement) {
+      gsap.to(btn, { opacity: 0 });
+    }
     // Add event listener to close modal
     private addModalCloseEvent() {
       const modal = document.querySelector('.section_rez');
