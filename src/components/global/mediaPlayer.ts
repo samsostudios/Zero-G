@@ -23,6 +23,8 @@ export const mediaPlayer = () => {
         const video = item.querySelector('.video-main') as HTMLVideoElement;
         const stroke = item.querySelector('.clip-img_stroke') as HTMLElement;
 
+        video.pause();
+
         if (video) {
           item.addEventListener('mouseenter', () => this.animateIn(video, stroke));
           item.addEventListener('mouseleave', () => this.animateOut(video, stroke));
