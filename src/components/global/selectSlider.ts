@@ -135,12 +135,12 @@ export const selectSlider = () => {
             }
           }
 
-          if (this.modalList.length !== 0) {
-            this.modalList[index].dataset.matchTag = slideTag;
-          }
-          if (this.modalLinks.length !== 0) {
-            this.modalLinks[index].dataset.matchTag = slideTag;
-          }
+          // if (this.modalList.length !== 0) {
+          //   this.modalList[index].dataset.matchTag = slideTag;
+          // }
+          // if (this.modalLinks.length !== 0) {
+          //   this.modalLinks[index].dataset.matchTag = slideTag;
+          // }
         }
       });
     }
@@ -161,13 +161,13 @@ export const selectSlider = () => {
         item.addEventListener('click', this.handleInteraction.bind(this));
       });
 
-      this.modalLinks.forEach((item) => {
-        item.addEventListener('click', (e) => {
-          this.showModal();
-        });
-      });
+      // this.modalLinks.forEach((item) => {
+      //   item.addEventListener('click', (e) => {
+      //     this.showModal();
+      //   });
+      // });
 
-      if (this.modal) this.modal.addEventListener('click', this.closeModal.bind(this));
+      // if (this.modal) this.modal.addEventListener('click', this.closeModal.bind(this));
 
       // if (window.matchMedia(this.tabletBreakpoint).matches) {
       //   // If on tablet or below, use click event
