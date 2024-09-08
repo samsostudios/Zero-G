@@ -17,10 +17,10 @@ export const pricing = () => {
         const itemText = item.querySelector('.text-size-small') as HTMLElement;
         const getText = itemText.innerHTML;
 
-        if (getText.includes('Individual')) {
+        if (getText.includes('Individual') || getText.includes('Section')) {
           itemText.innerHTML = 'Public Flights';
           itemGlyph.style.backgroundColor = '#006cfe';
-        } else if (getText.includes('Private')) {
+        } else if (getText.includes('Full')) {
           itemText.innerHTML = 'Private Flights';
           itemGlyph.style.backgroundColor = '#020d24';
         } else if (getText.includes('Mixed')) {
