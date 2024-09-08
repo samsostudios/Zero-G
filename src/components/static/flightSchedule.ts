@@ -9,6 +9,7 @@ export const flightSchedule = () => {
   class FlightSchedule {
     private scheduleMain: HTMLElement;
     private flightsWrap: HTMLElement;
+    private filters: HTMLElement[];
     private blockTemplate: HTMLElement;
     private headTemplate: HTMLElement;
     private rowTemplate: HTMLElement;
@@ -41,6 +42,7 @@ export const flightSchedule = () => {
     }[];
     private renderHeight: number;
     private easeFloat: any;
+    private currentFilterKey: string | null;
 
     constructor() {
       this.scheduleMain = document.querySelector('.schedule_main') as HTMLElement;
@@ -48,6 +50,9 @@ export const flightSchedule = () => {
       this.blockTemplate = document.querySelector('.block-template') as HTMLElement;
       this.headTemplate = document.querySelector('.head-template') as HTMLElement;
       this.rowTemplate = document.querySelector('.row-template') as HTMLElement;
+      this.filters = [...document.querySelectorAll('.filters_item')].map(
+        (item) => item as HTMLElement
+      );
       this.flightData = [
         ...(document.querySelectorAll('.sl_data-item') as NodeListOf<HTMLElement>),
       ];
@@ -55,6 +60,7 @@ export const flightSchedule = () => {
       this.sortedFlightData = [];
       this.renderHeight = 0;
       this.easeFloat = CustomEase.create('floatDown', 'M0,0 C0.25,0.1 0.25,1 1,1');
+      this.currentFilterKey = localStorage.getItem('flightFilter') || null;
 
       this.init();
     }
@@ -64,16 +70,103 @@ export const flightSchedule = () => {
       this.showLoadingAnimation();
 
       this.parsedFlightData = this.parseData(this.flightData);
-      this.sortedFlightData = this.sortFlights();
+      this.sortedFlightData = this.sortFlights(this.parsedFlightData);
+
+      console.log('DATA', this.parsedFlightData.length, this.parsedFlightData);
 
       const templates = document.querySelector('.sl_templates');
       gsap.set(templates, { display: 'none' });
+
+      this.setupFilterListeners();
 
       setTimeout(() => {
         this.renderUpdates();
         this.hideLoadingAnimation();
         // this.addModalCloseEvent();
       }, 2000);
+    }
+
+    // Apply filter based on localStorage
+    private applyInitialFilter() {
+      if (this.currentFilterKey) {
+        console.log('loading with key');
+        // this.applyFilter(this.currentFilterKey);
+        // Pre-check the correct filter based on local storage
+        const filterToCheck = Array.from(this.filters).find(
+          (filter) => filter.querySelector('input')?.value === this.currentFilterKey
+        );
+        if (filterToCheck) {
+          const input = filterToCheck.querySelector('input');
+          if (input) input.checked = true;
+        }
+      }
+    }
+
+    // Setup filter listeners
+    private setupFilterListeners() {
+      this.filters.forEach((filter) => {
+        const input = filter.querySelector('input') as HTMLInputElement;
+        if (input) {
+          input.addEventListener('change', (e) => {
+            const selectedParent = input.parentElement as HTMLElement;
+            const selectedFilter = selectedParent.querySelector('span')?.textContent as string;
+            `  `;
+
+            // Clear previous selections (only allow one selected at a time)
+            this.filters.forEach((filter) => {
+              const filterInput = filter.querySelector('input') as HTMLInputElement;
+              if (filterInput) {
+                filterInput.checked = false;
+
+                const filterLabel = filter.children[0] as HTMLElement;
+                filterLabel.style.color = '#000510';
+
+                const filterUI = filter.querySelector('.w-checkbox-input') as HTMLElement;
+                if (filterUI.classList.contains('w--redirected-checked')) {
+                  filterUI.classList.remove('w--redirected-checked');
+                }
+              }
+            });
+
+            input.checked = true;
+            selectedParent.style.color = '#F9FBFC';
+
+            // Save the current filter in local storage
+            console.log('SET LOCACL', selectedFilter);
+            // localStorage.setItem('flightFilter', selectedFilter);
+
+            // Apply the new filter
+            this.applyFilter(selectedFilter);
+          });
+        }
+      });
+    }
+
+    // Apply filter to parsed flight data
+    private applyFilter(filterKey: string) {
+      let filteredData = this.parsedFlightData;
+
+      console.log('@@@', filterKey);
+
+      // Filter based on flight type or show all flights
+      if (filterKey === 'Public Flights') {
+        console.log('public');
+        filteredData = this.parsedFlightData.filter((flight) => flight.type === 'Public Flights');
+      } else if (filterKey === 'Private Flights') {
+        console.log('private');
+        filteredData = this.parsedFlightData.filter((flight) => flight.type === 'Private Flights');
+      } else if (filterKey === 'Research Flights') {
+        console.log('research');
+        filteredData = this.parsedFlightData.filter((flight) => flight.type === 'Research Flights');
+      } else if (filterKey === 'All Flights') {
+        console.log('All Flight');
+        filteredData = this.parsedFlightData; // Show all flights
+      }
+
+      console.log('apply', filteredData);
+      // Update the sorted flight data and re-render the list
+      // this.sortedFlightData = this.sortFlights(filteredData);
+      // this.renderUpdates();
     }
 
     // Parse flight data from html feed
@@ -90,6 +183,10 @@ export const flightSchedule = () => {
         const colorElement = item.querySelector('.sl_d-color') as HTMLElement;
 
         let link = '#';
+
+        const dateObj = new Date(date);
+        const month = dateObj.toLocaleString('default', { month: 'long' });
+        const year = dateObj.getFullYear().toString();
 
         if (location !== '') {
           link = this.formatRowLink(location);
@@ -109,7 +206,27 @@ export const flightSchedule = () => {
 
         const color = colorElement.style.backgroundColor as string;
 
+        const flightDetails = { location, date, time, limitedSeats, soldOut, type, color };
+
+        const groupedFlights: {
+          month: string;
+          year: string;
+          flights: {
+            location: string;
+            date: string;
+            time: string;
+            limitedSeats: boolean;
+            soldOut: boolean;
+            type: string;
+            color: string;
+            price: string;
+            link: string;
+          };
+        }[] = [month, year, flightDetails];
+
         return {
+          month,
+          year,
           location,
           date,
           time,
@@ -191,22 +308,34 @@ export const flightSchedule = () => {
     }
 
     // Sort parsed data by month
-    private sortFlights() {
-      const groupedFlights: {
-        month: string;
-        year: string;
-        flights: {
-          location: string;
-          date: string;
-          time: string;
-          limitedSeats: boolean;
-          soldOut: boolean;
-          type: string;
-          color: string;
-          price: string;
-          link: string;
-        }[];
-      }[] = [];
+    private sortFlights(
+      data: {
+        location: string;
+        date: string;
+        time: string;
+        limitedSeats: boolean;
+        soldOut: boolean;
+        type: string;
+        color: string;
+        price: string;
+        link: string;
+      }[]
+    ) {
+      // const groupedFlights: {
+      //   month: string;
+      //   year: string;
+      //   flights: {
+      //     location: string;
+      //     date: string;
+      //     time: string;
+      //     limitedSeats: boolean;
+      //     soldOut: boolean;
+      //     type: string;
+      //     color: string;
+      //     price: string;
+      //     link: string;
+      //   }[];
+      // }[] = [];
 
       this.parsedFlightData.forEach((flight) => {
         const dateObj = new Date(flight.date);
