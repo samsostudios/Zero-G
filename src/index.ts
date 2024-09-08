@@ -31,6 +31,8 @@ window.Webflow.push(() => {
   initComponent('.section_featured-media', () => import('$gComponents/mediaPlayer'));
   initComponent('.section_home-flights', () => import('$gComponents/selectSlider'));
   initComponent('.section_brands', () => import('$gComponents/selectSlider'));
+  initComponent('.section_home-overview', () => import('$utils/revealVideos'));
+  initComponent('.section_flight-overview', () => import('$utils/revealVideos'));
 
   // Page Routing
   // ------------

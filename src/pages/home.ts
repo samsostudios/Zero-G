@@ -12,6 +12,7 @@ export const home = () => {
   const hero = document.querySelector('.section_home-hero') as HTMLElement;
   const heroVideo = [...document.querySelectorAll('video')][0] as HTMLVideoElement;
   // heroVideo.play();
+
   // Overview
   const overview = document.querySelector('.overview_p-grid') as HTMLElement;
   const oMedia = [...overview.querySelectorAll('video')];

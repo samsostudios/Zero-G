@@ -25,20 +25,20 @@ export const imageSlider = () => {
 
       this.imagesContainer.style.width = '150vw';
       this.imagesContainer.style.display = 'flex';
-      gsap.to(this.imagesContainer, { width: '150vw' });
+      // gsap.to(this.imagesContainer, { width: '150vw' });
 
       this.setupImages();
       this.initAnimation();
     }
 
     private setupImages() {
-      let maxWidth = window.innerWidth * 0.2;
+      let maxWidth = window.innerWidth * 0.33;
       console.log('max', maxWidth);
 
       // Webflow Mobile Portrait breakpoint (767px)
       if (window.innerWidth <= 767) {
         console.log('MOB');
-        maxWidth = window.innerWidth * 0.5;
+        maxWidth = window.innerWidth * 0.4;
       }
 
       this.images.forEach((image) => {
