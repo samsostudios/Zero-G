@@ -354,16 +354,10 @@ export const flightSchedule = () => {
         : (colorElement.style.backgroundColor = 'transparent');
       if (priceElement) priceElement.textContent = flight.price;
 
-      console.log(flight.link);
-      if (flight.link === '#') this.hideButton(buttonElement);
-
       if (linkElement) {
-        if (flight.link !== '#') {
-          if (flight.type === 'Public Flights') linkElement.href = flight.link;
-          else if (flight.type === 'Private Flights') linkElement.href = '/private-flight-bookings';
-          else if (flight.type === 'Research Flights')
-            linkElement.href = '/research-flight-bookings';
-        }
+        if (flight.type === 'Public Flights') linkElement.href = flight.link;
+        else if (flight.type === 'Private Flights') linkElement.href = '/private-flight-bookings';
+        else if (flight.type === 'Research Flights') linkElement.href = '/research-flight-bookings';
       }
 
       return row;
