@@ -3,17 +3,21 @@ import { gsap } from 'gsap';
 export const faq = () => {
   console.log('FAQ  - COMP');
   class FAQ {
-    private faqList: HTMLElement;
-    private faqItems: NodeListOf<HTMLElement>;
+    // private faqList: HTMLElement;
+    private faqList: HTMLElement[];
+    // private faqItems: HTMLElement[];
 
     constructor() {
-      this.faqList = document.querySelector('.faq_list') as HTMLElement;
-      this.faqItems = this.faqList.querySelectorAll('.faq_item') as NodeListOf<HTMLElement>;
+      // this.faqList = document.querySelector('.faq_list') as HTMLElement;
+      this.faqList = [...document.querySelectorAll('.faq_item')].map((item) => item as HTMLElement);
+      // this.faqItems = [...this.faqList.querySelectorAll('.faq_item')].map(
+      //   (item) => item as HTMLElement
+      // );
       this.init();
     }
 
     private init() {
-      this.faqItems.forEach((item) => {
+      this.faqList.forEach((item) => {
         const question = item.querySelector('.faq_item-q') as HTMLElement;
         const answer = item.querySelector('.faq_item-a') as HTMLElement;
 
@@ -32,7 +36,7 @@ export const faq = () => {
     }
 
     private closeAllItems() {
-      this.faqItems.forEach((item) => {
+      this.faqList.forEach((item) => {
         const answer = item.querySelector('.faq_item-a') as HTMLElement;
         gsap.to(answer, { height: 0, duration: 0.5 });
       });
