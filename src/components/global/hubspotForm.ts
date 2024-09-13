@@ -11,7 +11,6 @@ export const hubspotForm = () => {
     // private formID = 'fa0bc0e2-d2af-496e-abde-61d430b0b733';
     private formID: string;
     constructor() {
-      console.log('init');
       this.form = document.querySelector('.hs-form_form') as HTMLFormElement;
       this.formID = '';
       this.bindEvents();
@@ -26,6 +25,7 @@ export const hubspotForm = () => {
     }
 
     private validateEmail(email: string): boolean {
+      console.log('VALIDATE');
       const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       return emailPattern.test(email);
     }
@@ -66,7 +66,7 @@ export const hubspotForm = () => {
         return {};
       }
 
-      console.log('!!!', interestedIn, email);
+      // console.log('!!!', interestedIn, email);
 
       return {
         interested_in: interestedIn,
@@ -89,7 +89,7 @@ export const hubspotForm = () => {
         (document.querySelector("textarea[name='message']") as HTMLTextAreaElement)?.value || '';
 
       const check = this.getSelectedCheckboxes('filters_check-icon');
-      console.log('****', check);
+      // console.log('****', check);
 
       const firstName =
         (document.querySelector("input[name='firstname']") as HTMLInputElement)?.value || '';
@@ -186,7 +186,7 @@ export const hubspotForm = () => {
         (item) => item as HTMLInputElement
       );
 
-      console.log('?????', checkboxes);
+      // console.log('?????', checkboxes);
 
       // Initialize an array to store the selected values
       const selectedValues: string[] = [];
@@ -194,13 +194,13 @@ export const hubspotForm = () => {
       // Loop through checkboxes and collect values of checked ones
       checkboxes.forEach((checkbox: HTMLInputElement) => {
         const checkVal = checkbox.nextElementSibling as HTMLInputElement;
-        console.log('>>>>', checkVal);
+        // console.log('>>>>', checkVal);
         if (checkVal.checked) {
           // Assuming the label text is next to the checkbox
           const parent = checkbox.parentElement as HTMLElement;
 
           const label = parent.querySelector('span')?.textContent?.trim();
-          console.log('here', parent, label);
+          // console.log('here', parent, label);
           if (label) {
             selectedValues.push(label);
           }
@@ -257,17 +257,17 @@ export const hubspotForm = () => {
 
       // Proceed with form submission after reCAPTCHA validation
       const formAttr = this.form.dataset.name as string;
-      console.log('!!!', formAttr, formAttr.includes('Research Flight Bookings'));
+      // console.log('!!!', formAttr, formAttr.includes('Research Flight Bookings'));
       if (formAttr.includes('Private Charter Bookings')) {
-        console.log('Private');
+        // console.log('Private');
         const formData = this.collectPrivatetData();
         this.sendDataToHubSpot(formData);
-        console.log('Form Data:', formData);
+        // console.log('Form Data:', formData);
       } else if (formAttr.includes('Research Charter Bookings')) {
-        console.log('research');
+        // console.log('research');
         const formData = this.collectResearchtData();
         this.sendDataToHubSpot(formData);
-        console.log('Form Data:', formData);
+        // console.log('Form Data:', formData);
       } else {
         const formData = this.collectFlightData();
         this.sendDataToHubSpot(formData);
