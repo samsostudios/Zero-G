@@ -27,7 +27,6 @@ window.Webflow.push(() => {
   initComponent('.section_testimonials', () => import('$gComponents/testimonials'));
   initComponent('.section_img-slider', () => import('$gComponents/imageSlider'));
   initComponent('.section_hs-form', () => import('$gComponents/hubspotForm'));
-  initComponent('.section_pricing', () => import('$gComponents/pricing'));
   initComponent('.section_featured-media', () => import('$gComponents/mediaPlayer'));
   initComponent('.section_home-flights', () => import('$gComponents/selectSlider'));
   initComponent('.section_brands', () => import('$gComponents/selectSlider'));
