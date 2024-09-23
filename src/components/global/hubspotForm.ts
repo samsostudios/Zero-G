@@ -25,7 +25,7 @@ export const hubspotForm = () => {
     }
 
     private validateEmail(email: string): boolean {
-      console.log('VALIDATE');
+      // console.log('VALIDATE');
       const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       return emailPattern.test(email);
     }
