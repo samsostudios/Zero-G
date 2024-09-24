@@ -1,7 +1,7 @@
 import { gsap } from 'gsap';
 
 export const imageSlider = () => {
-  console.log('Slider - COMP');
+  // console.log('Slider - COMP');
   class ImageSlider {
     private imagesContainer: HTMLElement;
     private images: NodeListOf<HTMLElement>;
@@ -13,57 +13,69 @@ export const imageSlider = () => {
       this.imagesContainer = document.querySelector('.img-slider_track') as HTMLElement;
       this.images = document.querySelectorAll('.img-slider_img-wrap');
       this.totalWidth = 0;
-      this.slideDuration = parseInt(this.imagesContainer.dataset.slideSpeed as string) * 10;
+      this.slideDuration = parseInt(this.imagesContainer.dataset.slideSpeed as string);
+      this.imagesContainer.classList.remove('is-designer');
 
-      this.tl = gsap.timeline({ repeat: -1, yoyo: true });
-
-      console.log('before', this.imagesContainer);
-      console.log('before', this.imagesContainer.clientWidth);
-      // this.imagesContainer.style.width = '150vw';
-      // gsap.to(this.imagesContainer, { width: '150vw' });
-      console.log('afyer', this.imagesContainer.clientWidth);
-
-      this.imagesContainer.style.width = '150vw';
-      this.imagesContainer.style.display = 'flex';
-      // gsap.to(this.imagesContainer, { width: '150vw' });
+      this.tl = gsap.timeline();
 
       this.setupImages();
       this.initAnimation();
+      this.setResize();
     }
 
     private setupImages() {
-      let maxWidth = window.innerWidth * 0.33;
-      console.log('max', maxWidth);
+      // let maxWidth = window.innerWidth * 0.33;
+      // console.log('max', maxWidth);
 
-      // Webflow Mobile Portrait breakpoint (767px)
-      if (window.innerWidth <= 767) {
-        console.log('MOB');
-        maxWidth = window.innerWidth * 0.4;
+      if (window.innerWidth > 767) {
+        this.images.forEach((image) => {
+          image.style.flexShrink = '0';
+          image.style.flexGrow = '1';
+          image.style.width = '33vw';
+          // image.style.maxWidth = `${maxWidth}px`;
+          image.style.maxHeight = '50rem';
+          image.style.height = 'auto';
+
+          this.totalWidth += image.offsetWidth + 32;
+        });
       }
-
-      this.images.forEach((image) => {
-        image.style.flexShrink = '0';
-        image.style.flexGrow = '1';
-        image.style.width = `${maxWidth}px`;
-        image.style.height = 'auto';
-        console.log('offset', image.offsetWidth);
-        this.totalWidth += image.offsetWidth;
-      });
-
-      // Set the container's width to ensure all images are in a single row
-      this.imagesContainer.style.width = `${this.totalWidth}px`;
     }
 
     private initAnimation() {
-      const duration = this.totalWidth / 100; // Adjust the speed of the animation
-
-      console.log('here', this.totalWidth, window.innerWidth, this.totalWidth - window.innerWidth);
-
+      this.tl = gsap.timeline({ repeat: -1, yoyo: true });
       this.tl.to(this.imagesContainer, {
-        x: `-${this.totalWidth - window.innerWidth}px`, // Move left until the last image is at the edge
+        x: `-${this.totalWidth - window.innerWidth}px`,
         ease: 'linear',
-        duration: duration,
+        duration: this.slideDuration,
       });
+    }
+
+    private setResize() {
+      const debouncedResize = this.debounce(() => {
+        this.tl.kill();
+        gsap.set(this.imagesContainer, {
+          x: 0,
+        });
+        this.totalWidth = 0;
+        this.setupImages();
+        this.initAnimation();
+      }, 300);
+
+      window.addEventListener('resize', debouncedResize);
+    }
+
+    private debounce(func: () => void, wait: number) {
+      let timeout: number | undefined;
+
+      return () => {
+        const later = () => {
+          timeout = undefined;
+          func();
+        };
+
+        clearTimeout(timeout);
+        timeout = window.setTimeout(later, wait);
+      };
     }
   }
 
