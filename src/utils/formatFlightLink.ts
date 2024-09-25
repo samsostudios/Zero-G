@@ -59,7 +59,5 @@ export const formatFlightLink = (text: string) => {
       ? stateAbbreviations[stateAbbr.toUpperCase()]
       : stateAbbr.toLowerCase();
 
-  // console.log('!!!!', formattedCity, formattedState);
-
   return `/flight-locations/${formattedCity}-${formattedState}`;
 };
