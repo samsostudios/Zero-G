@@ -8,6 +8,7 @@ export const imageSlider = () => {
     private totalWidth: number;
     private slideDuration: number;
     private tl: gsap.core.Timeline;
+    private isDev: boolean;
 
     constructor() {
       this.imagesContainer = document.querySelector('.img-slider_track') as HTMLElement;
@@ -16,42 +17,45 @@ export const imageSlider = () => {
       this.slideDuration = parseInt(this.imagesContainer.dataset.slideSpeed as string);
       this.imagesContainer.classList.remove('is-designer');
 
+      this.isDev = window.location.href.includes('?dev');
+
       this.tl = gsap.timeline();
 
-      setTimeout(() => {
-        this.setupImages();
-        this.initAnimation();
-        this.setResize();
-      }, 500);
+      this.setupImages();
+      // this.initAnimation();
+      this.setResize();
     }
 
     private setupImages() {
-      // let maxWidth = window.innerWidth * 0.33;
-      // console.log('max', maxWidth);
-
       if (window.innerWidth > 767) {
         this.images.forEach((image) => {
           image.style.flexShrink = '0';
           image.style.flexGrow = '1';
           image.style.width = '33vw';
-          // image.style.maxWidth = `${maxWidth}px`;
           image.style.maxHeight = '50rem';
           image.style.height = 'auto';
 
-          console.log('offset', image.offsetWidth);
+          requestAnimationFrame(() => {
+            console.log('img width', image.clientWidth);
 
-          this.totalWidth += image.offsetWidth + 32;
+            this.totalWidth += image.clientWidth + 32;
+            this.initAnimation();
+          });
         });
       }
     }
 
     private initAnimation() {
       console.log('here', this.totalWidth, window.innerWidth);
+      let dur = 0;
+      this.isDev ? (dur = 5) : (dur = this.slideDuration);
+
+      console.log(dur);
       this.tl = gsap.timeline({ repeat: -1, yoyo: true });
       this.tl.to(this.imagesContainer, {
         x: `-${this.totalWidth - window.innerWidth}px`,
         ease: 'linear',
-        duration: 5,
+        duration: dur,
       });
     }
 
