@@ -18,7 +18,7 @@ export const brandsSelector = () => {
 
     private init() {
       this.brandsMedia.forEach((item, index) => {
-        console.log('here', item);
+        // console.log('here', item);
         if (index !== 0) {
           item.style.opacity = '0';
           item.style.transform = 'translateY(100%)';

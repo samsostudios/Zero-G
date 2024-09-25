@@ -130,7 +130,7 @@ export const flightSchedule = () => {
     private applyFilter(filterKey: string) {
       let filteredData = this.parsedFlightData;
 
-      console.log('@@@', filterKey);
+      // console.log('@@@', filterKey);
 
       // Filter based on flight type or show all flights
       if (filterKey === 'Public Flights') {
@@ -147,7 +147,7 @@ export const flightSchedule = () => {
         filteredData = this.parsedFlightData; // Show all flights
       }
 
-      console.log('apply', filteredData);
+      // console.log('apply', filteredData);
       // Update the sorted flight data and re-render the list
       // this.sortedFlightData = this.sortFlights(filteredData);
       // this.renderUpdates();

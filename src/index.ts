@@ -33,6 +33,7 @@ window.Webflow.push(() => {
   initComponent('.section_home-overview', () => import('$utils/revealVideos'));
   initComponent('.section_flight-overview', () => import('$utils/revealVideos'));
   initComponent('.banner_component', () => import('$gComponents/crowdfundBanner'));
+  initComponent('.section_featured-schedule', () => import('$gComponents/featuredFlights'));
 
   // Page Routing
   // ------------
