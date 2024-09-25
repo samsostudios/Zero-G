@@ -157,6 +157,8 @@ export const flightSchedule = () => {
     private parseData(data: HTMLElement[]) {
       const flightArray = data.map((item) => {
         let location = item.querySelector('.sl_d-location')?.textContent?.trim() || '';
+        const locationOverride =
+          item.querySelector('.sl_d-location.is-override')?.textContent?.trim() || '';
         const date = item.querySelector('.sl_d-date')?.textContent?.trim() || '';
         const time = item.querySelector('.sl_d-time')?.textContent?.trim() || '';
         // const linkLocaion = location;
@@ -175,7 +177,11 @@ export const flightSchedule = () => {
         if (location !== '') {
           link = this.formatRowLink(location);
         } else {
-          location = 'Location - TBD';
+          if (locationOverride === '') {
+            location = 'Location - TBD';
+          } else {
+            location = locationOverride;
+          }
         }
 
         const limitedSeats =
@@ -189,6 +195,8 @@ export const flightSchedule = () => {
             : false;
 
         const color = colorElement.style.backgroundColor as string;
+
+        // console.log('loc', location);
 
         return {
           month,

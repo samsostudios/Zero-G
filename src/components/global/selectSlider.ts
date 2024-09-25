@@ -220,7 +220,7 @@ export const selectSlider = () => {
       // const targetFiImage = targetMedia.querySelector('.fi_image') as HTMLImageElement;
       const targetFiVideo = targetMedia.querySelector('.video-main') as HTMLVideoElement;
 
-      console.log('ANIMATE', targetFiVideo);
+      // console.log('ANIMATE', targetFiVideo);
 
       // Animate Type List Container
       this.currentType.classList.remove('is-active');
