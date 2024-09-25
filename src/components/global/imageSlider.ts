@@ -18,9 +18,11 @@ export const imageSlider = () => {
 
       this.tl = gsap.timeline();
 
-      this.setupImages();
-      this.initAnimation();
-      this.setResize();
+      setTimeout(() => {
+        this.setupImages();
+        this.initAnimation();
+        this.setResize();
+      }, 500);
     }
 
     private setupImages() {
@@ -36,17 +38,20 @@ export const imageSlider = () => {
           image.style.maxHeight = '50rem';
           image.style.height = 'auto';
 
+          console.log('offset', image.offsetWidth);
+
           this.totalWidth += image.offsetWidth + 32;
         });
       }
     }
 
     private initAnimation() {
+      console.log('here', this.totalWidth, window.innerWidth);
       this.tl = gsap.timeline({ repeat: -1, yoyo: true });
       this.tl.to(this.imagesContainer, {
         x: `-${this.totalWidth - window.innerWidth}px`,
         ease: 'linear',
-        duration: this.slideDuration,
+        duration: 5,
       });
     }
 
