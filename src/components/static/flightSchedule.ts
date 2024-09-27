@@ -42,7 +42,7 @@ export const flightSchedule = () => {
     }[];
     private renderHeight: number;
     private easeFloat: any;
-    // private currentFilterKey: string | null;
+    private currentFilterKey: string | null;
 
     constructor() {
       this.scheduleMain = document.querySelector('.schedule_main') as HTMLElement;
@@ -60,7 +60,7 @@ export const flightSchedule = () => {
       this.sortedFlightData = [];
       this.renderHeight = 0;
       this.easeFloat = CustomEase.create('floatDown', 'M0,0 C0.25,0.1 0.25,1 1,1');
-      // this.currentFilterKey = localStorage.getItem('flightFilter') || null;
+      this.currentFilterKey = localStorage.getItem('flightFilter') || 'All';
 
       this.init();
     }
@@ -70,9 +70,10 @@ export const flightSchedule = () => {
       this.showLoadingAnimation();
 
       this.parsedFlightData = this.parseData(this.flightData);
-      this.sortedFlightData = this.sortFlights(this.parsedFlightData);
+      this.sortedFlightData = this.sortFlights(this.currentFilterKey);
 
-      // console.log('DATA', this.parsedFlightData.length, this.parsedFlightData);
+      console.log('DATA', this.parsedFlightData, this.sortedFlightData);
+      console.log('here', this.currentFilterKey);
 
       const templates = document.querySelector('.sl_templates');
       gsap.set(templates, { display: 'none' });
@@ -82,6 +83,7 @@ export const flightSchedule = () => {
       setTimeout(() => {
         this.renderUpdates();
         this.hideLoadingAnimation();
+        this.setupFilterListeners();
         // this.addModalCloseEvent();
       }, 2000);
     }
@@ -94,29 +96,17 @@ export const flightSchedule = () => {
           input.addEventListener('change', (e) => {
             const selectedParent = input.parentElement as HTMLElement;
             const selectedFilter = selectedParent.querySelector('span')?.textContent as string;
-            `  `;
+
+            console.log('parent', input, selectedParent, selectedFilter);
 
             // Clear previous selections (only allow one selected at a time)
-            this.filters.forEach((filter) => {
-              const filterInput = filter.querySelector('input') as HTMLInputElement;
-              if (filterInput) {
-                filterInput.checked = false;
-
-                const filterLabel = filter.children[0] as HTMLElement;
-                filterLabel.style.color = '#000510';
-
-                const filterUI = filter.querySelector('.w-checkbox-input') as HTMLElement;
-                if (filterUI.classList.contains('w--redirected-checked')) {
-                  filterUI.classList.remove('w--redirected-checked');
-                }
-              }
-            });
+            this.resetFilters();
 
             input.checked = true;
             selectedParent.style.color = '#F9FBFC';
 
             // Save the current filter in local storage
-            console.log('SET LOCACL', selectedFilter);
+            // console.log('SET LOCACL', selectedFilter);
             // localStorage.setItem('flightFilter', selectedFilter);
 
             // Apply the new filter
@@ -130,7 +120,7 @@ export const flightSchedule = () => {
     private applyFilter(filterKey: string) {
       let filteredData = this.parsedFlightData;
 
-      // console.log('@@@', filterKey);
+      console.log('@@@', filterKey);
 
       // Filter based on flight type or show all flights
       if (filterKey === 'Public Flights') {
@@ -147,10 +137,12 @@ export const flightSchedule = () => {
         filteredData = this.parsedFlightData; // Show all flights
       }
 
-      // console.log('apply', filteredData);
       // Update the sorted flight data and re-render the list
       // this.sortedFlightData = this.sortFlights(filteredData);
+      console.log('sorted ', filterKey, this.sortedFlightData);
       // this.renderUpdates();
+
+      console.log('apply', filteredData);
     }
 
     // Parse flight data from html feed
@@ -284,19 +276,7 @@ export const flightSchedule = () => {
     }
 
     // Sort parsed data by month
-    private sortFlights(
-      data: {
-        location: string;
-        date: string;
-        time: string;
-        limitedSeats: boolean;
-        soldOut: boolean;
-        type: string;
-        color: string;
-        price: string;
-        link: string;
-      }[]
-    ) {
+    private sortFlights(filter: string) {
       const groupedFlights: {
         month: string;
         year: string;
@@ -460,18 +440,6 @@ export const flightSchedule = () => {
     private hideButton(btn: HTMLElement) {
       gsap.to(btn, { opacity: 0 });
     }
-    // Add event listener to close modal
-    private addModalCloseEvent() {
-      const modal = document.querySelector('.section_rez');
-      if (modal) {
-        modal.addEventListener('click', (e) => {
-          if (e.target === modal) {
-            // Only close if clicking outside the content
-            this.closeModal();
-          }
-        });
-      }
-    }
 
     // Render Updates to DOM
     private renderUpdates() {
@@ -535,28 +503,22 @@ export const flightSchedule = () => {
       }
     }
 
-    // Open modal function triggered by row click
-    private openModal() {
-      const modal = document.querySelector('.section_rez');
-      if (modal) {
-        gsap.set(modal, { display: 'flex' });
-        gsap.fromTo(modal, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1 });
-      }
-    }
+    private resetFilters() {
+      this.filters.forEach((filter) => {
+        console.log('reset', filter);
+        const filterInput = filter.querySelector('input') as HTMLInputElement;
+        if (filterInput) {
+          filterInput.checked = false;
 
-    // Close modal function triggered by clicking on modal
-    private closeModal() {
-      const modal = document.querySelector('.section_rez');
-      if (modal) {
-        gsap.to(modal, {
-          opacity: 0,
-          scale: 0.8,
-          duration: 0.5,
-          onComplete: () => {
-            gsap.set(modal, { display: 'none' });
-          },
-        });
-      }
+          const filterLabel = filter.children[0] as HTMLElement;
+          filterLabel.style.color = '#000510';
+
+          const filterUI = filter.querySelector('.w-checkbox-input') as HTMLElement;
+          if (filterUI.classList.contains('w--redirected-checked')) {
+            filterUI.classList.remove('w--redirected-checked');
+          }
+        }
+      });
     }
   }
 
