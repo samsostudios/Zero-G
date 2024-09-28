@@ -1,7 +1,7 @@
 import { gsap } from 'gsap';
 
 export const testimonialsSlider = () => {
-  console.log('Testimonials - COMP');
+  // console.log('Testimonials - COMP');
   class TestimonialSlider {
     private testimonialsList: HTMLElement;
     private testimonialsItems: NodeListOf<HTMLElement>;

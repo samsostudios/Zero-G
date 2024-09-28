@@ -1,7 +1,7 @@
 import { gsap } from 'gsap';
 
 export const faq = () => {
-  console.log('FAQ  - COMP');
+  // console.log('FAQ  - COMP');
   class FAQ {
     // private faqList: HTMLElement;
     private faqList: HTMLElement[];

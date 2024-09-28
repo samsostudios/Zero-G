@@ -42,7 +42,8 @@ export const flightSchedule = () => {
     }[];
     private renderHeight: number;
     private easeFloat: any;
-    private currentFilterKey: string | null;
+    private currentFilterKey: string;
+    private activeFilters: string[] = [];
 
     constructor() {
       this.scheduleMain = document.querySelector('.schedule_main') as HTMLElement;
@@ -50,7 +51,7 @@ export const flightSchedule = () => {
       this.blockTemplate = document.querySelector('.block-template') as HTMLElement;
       this.headTemplate = document.querySelector('.head-template') as HTMLElement;
       this.rowTemplate = document.querySelector('.row-template') as HTMLElement;
-      this.filters = [...document.querySelectorAll('.filters_item')].map(
+      this.filters = [...document.querySelectorAll('.filters_checkbox')].map(
         (item) => item as HTMLElement
       );
       this.flightData = [
@@ -60,7 +61,7 @@ export const flightSchedule = () => {
       this.sortedFlightData = [];
       this.renderHeight = 0;
       this.easeFloat = CustomEase.create('floatDown', 'M0,0 C0.25,0.1 0.25,1 1,1');
-      this.currentFilterKey = localStorage.getItem('flightFilter') || 'All';
+      this.currentFilterKey = localStorage.getItem('flightFilter') || 'All Flights';
 
       this.init();
     }
@@ -68,12 +69,12 @@ export const flightSchedule = () => {
     // initialize
     private init() {
       this.showLoadingAnimation();
+      this.setActiveFilter(this.currentFilterKey);
 
       this.parsedFlightData = this.parseData(this.flightData);
+      // console.log('PARSED DATA', this.parsedFlightData);
       this.sortedFlightData = this.sortFlights(this.currentFilterKey);
-
-      console.log('DATA', this.parsedFlightData, this.sortedFlightData);
-      console.log('here', this.currentFilterKey);
+      console.log('SORTED DATA', this.sortedFlightData);
 
       const templates = document.querySelector('.sl_templates');
       gsap.set(templates, { display: 'none' });
@@ -86,63 +87,6 @@ export const flightSchedule = () => {
         this.setupFilterListeners();
         // this.addModalCloseEvent();
       }, 2000);
-    }
-
-    // Setup filter listeners
-    private setupFilterListeners() {
-      this.filters.forEach((filter) => {
-        const input = filter.querySelector('input') as HTMLInputElement;
-        if (input) {
-          input.addEventListener('change', (e) => {
-            const selectedParent = input.parentElement as HTMLElement;
-            const selectedFilter = selectedParent.querySelector('span')?.textContent as string;
-
-            console.log('parent', input, selectedParent, selectedFilter);
-
-            // Clear previous selections (only allow one selected at a time)
-            this.resetFilters();
-
-            input.checked = true;
-            selectedParent.style.color = '#F9FBFC';
-
-            // Save the current filter in local storage
-            // console.log('SET LOCACL', selectedFilter);
-            // localStorage.setItem('flightFilter', selectedFilter);
-
-            // Apply the new filter
-            this.applyFilter(selectedFilter);
-          });
-        }
-      });
-    }
-
-    // Apply filter to parsed flight data
-    private applyFilter(filterKey: string) {
-      let filteredData = this.parsedFlightData;
-
-      console.log('@@@', filterKey);
-
-      // Filter based on flight type or show all flights
-      if (filterKey === 'Public Flights') {
-        console.log('public');
-        filteredData = this.parsedFlightData.filter((flight) => flight.type === 'Public Flights');
-      } else if (filterKey === 'Private Flights') {
-        console.log('private');
-        filteredData = this.parsedFlightData.filter((flight) => flight.type === 'Private Flights');
-      } else if (filterKey === 'Research Flights') {
-        console.log('research');
-        filteredData = this.parsedFlightData.filter((flight) => flight.type === 'Research Flights');
-      } else if (filterKey === 'All Flights') {
-        console.log('All Flight');
-        filteredData = this.parsedFlightData; // Show all flights
-      }
-
-      // Update the sorted flight data and re-render the list
-      // this.sortedFlightData = this.sortFlights(filteredData);
-      console.log('sorted ', filterKey, this.sortedFlightData);
-      // this.renderUpdates();
-
-      console.log('apply', filteredData);
     }
 
     // Parse flight data from html feed
@@ -206,6 +150,219 @@ export const flightSchedule = () => {
       });
 
       return flightArray;
+    }
+
+    // Setup filter listeners
+    private setupFilterListeners() {
+      this.filters.forEach((filter) => {
+        const input = filter.querySelector('input') as HTMLInputElement;
+        if (input) {
+          input.addEventListener('change', () => {
+            const selectedParent = input.parentElement as HTMLElement;
+            const selectedFilter = selectedParent.querySelector('span')?.textContent?.trim() || '';
+
+            if (this.currentFilterKey === selectedFilter) {
+              this.currentFilterKey = 'All Flights';
+              this.resetFilters();
+              this.setActiveFilter(this.currentFilterKey);
+            } else {
+              this.currentFilterKey = selectedFilter;
+              this.resetFilters();
+              this.setActiveFilter(this.currentFilterKey);
+            }
+
+            localStorage.setItem('flightFilter', this.currentFilterKey);
+
+            this.sortedFlightData = this.sortFlights(this.currentFilterKey);
+            this.renderUpdates();
+          });
+        }
+      });
+    }
+
+    // Sort parsed data by month
+    private sortFlights(filter: string) {
+      const groupedFlights: {
+        month: string;
+        year: string;
+        flights: {
+          location: string;
+          date: string;
+          time: string;
+          limitedSeats: boolean;
+          soldOut: boolean;
+          type: string;
+          color: string;
+          price: string;
+          link: string;
+        }[];
+      }[] = [];
+
+      let filteredData = this.parsedFlightData;
+
+      // console.log('!!', filter);
+
+      // Apply filtering based on the filter key
+      if (filter !== 'All Flights') {
+        filteredData = this.parsedFlightData.filter((flight) => flight.type === filter);
+      }
+
+      // Sort flights by date and then by time ("Morning Flight" before "Afternoon Flight")
+      filteredData.sort((a, b) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+
+        // First, compare by date
+        if (dateA.getTime() !== dateB.getTime()) {
+          return dateA.getTime() - dateB.getTime();
+        }
+
+        // If the flights are on the same date, compare by "time" field
+        if (a.time === 'Morning Flight' && b.time === 'Afternoon Flight') {
+          return -1; // Morning comes first
+        }
+        if (a.time === 'Afternoon Flight' && b.time === 'Morning Flight') {
+          return 1; // Afternoon comes second
+        }
+        return 0;
+      });
+
+      // console.log('FILTERED', filteredData);
+
+      filteredData.forEach((flight) => {
+        const dateObj = new Date(flight.date);
+        const month = dateObj.toLocaleString('default', { month: 'long' });
+        const year = dateObj.getFullYear().toString();
+
+        let monthYearGroup = groupedFlights.find(
+          (group) => group.month === month && group.year === year
+        );
+
+        if (!monthYearGroup) {
+          // If there's no group for the current month and year, create a new one
+          monthYearGroup = { month, year, flights: [] };
+          groupedFlights.push(monthYearGroup);
+        }
+
+        // Add the flight to the current month-year group
+        monthYearGroup.flights.push(flight);
+      });
+
+      return groupedFlights;
+    }
+
+    // Render Updates to DOM
+    private renderUpdates() {
+      this.clearList();
+      const blocks = this.sortedFlightData
+        .map((group) => this.createFlightBlock(group))
+        .filter((block) => block !== null);
+
+      this.calculateRenderHeight(blocks);
+
+      gsap.to(this.scheduleMain, {
+        duration: 1,
+        height: this.renderHeight,
+        ease: 'power3.inOut',
+      });
+
+      this.revealBlock(blocks);
+    }
+
+    // Create new flight block for the schedule
+    private createFlightBlock(group: {
+      month: string;
+      year: string;
+      flights: {
+        location: string;
+        date: string;
+        time: string;
+        limitedSeats: boolean;
+        soldOut: boolean;
+        type: string;
+        color: string;
+        price: string;
+        link: string;
+      }[];
+    }) {
+      const block = this.blockTemplate.cloneNode(true) as HTMLElement;
+      block.classList.remove('block-template');
+
+      // Block Head
+      const head = this.headTemplate.cloneNode(true) as HTMLElement;
+      const headMonth = head.querySelector('.sl_head-month');
+      const headYear = head.querySelector('.sl_head-year');
+
+      if (headMonth) headMonth.textContent = group.month;
+      if (headYear) headYear.textContent = group.year;
+
+      block.appendChild(head);
+
+      // Block Rows
+      group.flights.forEach((flight) => {
+        const row = this.rowTemplate.cloneNode(true) as HTMLElement;
+        const locationElement = row.querySelector('.sl_row-location');
+        const dateElement = row.querySelector('.sl_row-date');
+        const timeElement = row.querySelector('.sl_row-time');
+        const limitedSeatsElement = row.querySelector('.sl_tag.is-ls') as HTMLElement;
+        const soldOutElement = row.querySelector('.sl_tag.is-so') as HTMLElement;
+        const typeElement = row.querySelector('.sl_row-type') as HTMLElement;
+        const colorElement = row.querySelector('.sl_row-glyph') as HTMLElement;
+        const priceElement = row.querySelector('.sl_row-price') as HTMLElement;
+        const linkElement = row as HTMLAnchorElement;
+
+        if (locationElement) locationElement.textContent = flight.location;
+        if (dateElement) dateElement.textContent = flight.date;
+        if (timeElement) timeElement.textContent = flight.time;
+        if (limitedSeatsElement)
+          limitedSeatsElement.style.display = flight.limitedSeats ? 'block' : 'none';
+        if (soldOutElement) soldOutElement.style.display = flight.soldOut ? 'block' : 'none';
+        if (typeElement) typeElement.textContent = flight.type;
+        if (colorElement) colorElement.style.backgroundColor = flight.color;
+        flight.color
+          ? (colorElement.style.backgroundColor = flight.color)
+          : (colorElement.style.backgroundColor = 'transparent');
+        if (priceElement) priceElement.textContent = flight.price;
+
+        block.appendChild(row);
+      });
+
+      return block;
+    }
+
+    private clearList() {
+      this.flightsWrap.innerHTML = '';
+      this.renderHeight = 0;
+    }
+
+    //Calc height of new schedule object
+    private calculateRenderHeight(blocks: HTMLElement[]) {
+      blocks.forEach((item) => {
+        item.style.position = 'aboslute';
+        item.style.left = '-9999px';
+        document.body.appendChild(item);
+
+        this.renderHeight += item.clientHeight + 32;
+
+        item.remove();
+      });
+    }
+
+    //Reveal schedule elements
+    private revealBlock(blocks: HTMLElement[]) {
+      if (!this.scheduleMain) return;
+      if (!this.flightsWrap) return;
+
+      blocks.forEach((item) => {
+        if (item) {
+          this.flightsWrap.appendChild(item);
+          gsap.fromTo(
+            item,
+            { y: '1rem', opacity: 0 },
+            { delay: 0.2, y: 0, opacity: 1, ease: this.easeFloat }
+          );
+        }
+      });
     }
 
     //format link text
@@ -275,206 +432,6 @@ export const flightSchedule = () => {
       return `/flight-locations/${formattedCity}-${formattedState}`;
     }
 
-    // Sort parsed data by month
-    private sortFlights(filter: string) {
-      const groupedFlights: {
-        month: string;
-        year: string;
-        flights: {
-          location: string;
-          date: string;
-          time: string;
-          limitedSeats: boolean;
-          soldOut: boolean;
-          type: string;
-          color: string;
-          price: string;
-          link: string;
-        }[];
-      }[] = [];
-
-      this.parsedFlightData.forEach((flight) => {
-        const dateObj = new Date(flight.date);
-        const month = dateObj.toLocaleString('default', { month: 'long' });
-        const year = dateObj.getFullYear().toString();
-
-        let monthYearGroup = groupedFlights.find(
-          (group) => group.month === month && group.year === year
-        );
-
-        if (!monthYearGroup) {
-          // If there's no group for the current month and year, create a new one
-          monthYearGroup = { month, year, flights: [] };
-          groupedFlights.push(monthYearGroup);
-        }
-
-        // Add the flight to the current month-year group
-        monthYearGroup.flights.push(flight);
-      });
-
-      return groupedFlights;
-    }
-
-    //Calc height of new schedule object
-    private calculateRenderHeight(blocks: HTMLElement[]) {
-      const setPad = 96;
-      this.renderHeight = setPad;
-
-      blocks.forEach((item) => {
-        item.style.position = 'aboslute';
-        item.style.left = '-9999px';
-        document.body.appendChild(item);
-
-        this.renderHeight += item.clientHeight;
-
-        item.remove();
-      });
-    }
-
-    // Create new flight head
-    private createHead(month: string, year: string) {
-      const head = this.headTemplate.cloneNode(true) as HTMLElement;
-      head.classList.remove('head-template');
-      const headMonth = head.querySelector('.sl_head-month');
-      const headYear = head.querySelector('.sl_head-year');
-
-      if (headMonth) headMonth.textContent = month;
-      if (headYear) headYear.textContent = year;
-
-      return head;
-    }
-
-    //Create new flight row
-    private createRow(flight: {
-      location: string;
-      date: string;
-      time: string;
-      limitedSeats: boolean;
-      soldOut: boolean;
-      type: string;
-      color: string;
-      price: string;
-      link: string;
-    }) {
-      if (!this.rowTemplate) {
-        console.log('WARN // Missing Row Template Tag');
-        return;
-      }
-
-      const row = this.rowTemplate.cloneNode(true) as HTMLElement;
-      row.classList.remove('row-template');
-
-      const locationElement = row.querySelector('.sl_row-location');
-      const dateElement = row.querySelector('.sl_row-date');
-      const timeElement = row.querySelector('.sl_row-time');
-      const limitedSeatsElement = row.querySelector('.sl_tag.is-ls') as HTMLElement;
-      const soldOutElement = row.querySelector('.sl_tag.is-so') as HTMLElement;
-      const typeElement = row.querySelector('.sl_row-type') as HTMLElement;
-      const colorElement = row.querySelector('.sl_row-glyph') as HTMLElement;
-      const priceElement = row.querySelector('.sl_row-price') as HTMLElement;
-      const linkElement = row as HTMLAnchorElement;
-      const buttonElement = row.querySelector('.sl_button-wrap') as HTMLElement;
-
-      // console.log('ROW', flight);
-
-      if (locationElement) locationElement.textContent = flight.location;
-      if (dateElement) dateElement.textContent = flight.date;
-      if (timeElement) timeElement.textContent = flight.time;
-      // debug
-      if (limitedSeatsElement)
-        limitedSeatsElement.style.display = flight.limitedSeats ? 'block' : 'none';
-      if (soldOutElement) soldOutElement.style.display = flight.soldOut ? 'block' : 'none';
-
-      if (typeElement) typeElement.textContent = flight.type;
-      if (colorElement) colorElement.style.backgroundColor = flight.color;
-      flight.color
-        ? (colorElement.style.backgroundColor = flight.color)
-        : (colorElement.style.backgroundColor = 'transparent');
-      if (priceElement) priceElement.textContent = flight.price;
-
-      // console.log(flight.link);
-      // if (flight.link === '#') this.hideButton(buttonElement);
-
-      if (linkElement) {
-        if (flight.type === 'Public Flights') linkElement.href = flight.link;
-        else if (flight.type === 'Private Flights') linkElement.href = '/private-flight-bookings';
-        else if (flight.type === 'Research Flights') linkElement.href = '/research-flight-bookings';
-        // if (flight.link !== '#') {
-        // }
-      }
-
-      return row;
-    }
-
-    // Create new flightBlock
-    private createFlightBlock(group: {
-      month: string;
-      year: string;
-      flights: {
-        location: string;
-        date: string;
-        time: string;
-        limitedSeats: boolean;
-        soldOut: boolean;
-        type: string;
-        color: string;
-        price: string;
-        link: string;
-      }[];
-    }) {
-      const block = this.blockTemplate.cloneNode(true) as HTMLElement;
-      block.classList.remove('block-template');
-
-      const head = this.createHead(group.month, group.year);
-      block.appendChild(head);
-
-      group.flights.forEach((flight) => {
-        const row = this.createRow(flight);
-        if (row) block.appendChild(row);
-      });
-
-      return block;
-    }
-
-    // Hide button if no link present
-    private hideButton(btn: HTMLElement) {
-      gsap.to(btn, { opacity: 0 });
-    }
-
-    // Render Updates to DOM
-    private renderUpdates() {
-      const blocks = this.sortedFlightData
-        .map((group) => this.createFlightBlock(group))
-        .filter((block) => block !== null);
-
-      this.calculateRenderHeight(blocks);
-
-      gsap.to(this.scheduleMain, {
-        duration: 1,
-        height: this.renderHeight,
-        ease: 'power3.inOut',
-      });
-
-      this.revealBlock(blocks);
-    }
-
-    //Reveal schedule elements
-    private revealBlock(blocks: HTMLElement[]) {
-      if (!this.scheduleMain) return;
-      if (!this.flightsWrap) return;
-
-      blocks.forEach((item) => {
-        if (item) {
-          this.flightsWrap.appendChild(item);
-          gsap.fromTo(
-            item,
-            { y: '1rem', opacity: 0 },
-            { delay: 0.2, y: 0, opacity: 1, ease: this.easeFloat }
-          );
-        }
-      });
-    }
-
     // Show loading animation
     private showLoadingAnimation() {
       const loadingWrap = document.querySelector('.schedule_loader-wrap');
@@ -503,21 +460,32 @@ export const flightSchedule = () => {
       }
     }
 
+    // Set Current Active Filter
+    private setActiveFilter(filter: string) {
+      let setActive = this.filters[0];
+
+      if (filter === 'Research Flights') setActive = this.filters[1] as HTMLElement;
+      else if (filter === 'Public Flights') setActive = this.filters[2] as HTMLElement;
+      else if (filter === 'Private Flights') setActive = this.filters[3] as HTMLElement;
+
+      const filterUI = setActive.querySelector('.filters_check-icon') as HTMLElement;
+      const filterInput = setActive.querySelector('input') as HTMLInputElement;
+
+      filterInput.checked = true;
+
+      setActive.classList.add('is-checked');
+      filterUI.classList.add('is-checked');
+    }
+
+    // Reset Filter Checkbox State
     private resetFilters() {
       this.filters.forEach((filter) => {
-        console.log('reset', filter);
+        const filterUI = filter.querySelector('.filters_check-icon') as HTMLElement;
         const filterInput = filter.querySelector('input') as HTMLInputElement;
-        if (filterInput) {
-          filterInput.checked = false;
+        filterInput.checked = false;
 
-          const filterLabel = filter.children[0] as HTMLElement;
-          filterLabel.style.color = '#000510';
-
-          const filterUI = filter.querySelector('.w-checkbox-input') as HTMLElement;
-          if (filterUI.classList.contains('w--redirected-checked')) {
-            filterUI.classList.remove('w--redirected-checked');
-          }
-        }
+        if (filter.classList.contains('is-checked')) filter.classList.remove('is-checked');
+        if (filterUI.classList.contains('is-checked')) filterUI.classList.remove('is-checked');
       });
     }
   }

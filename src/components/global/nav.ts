@@ -6,7 +6,7 @@ gsap.registerPlugin(ScrollTrigger);
 gsap.registerPlugin(CustomEase);
 
 export const nav = () => {
-  console.log('Nav - COMP');
+  // console.log('Nav - COMP');
   class Nav {
     private navComponent: HTMLElement;
     private navBg: HTMLElement;
