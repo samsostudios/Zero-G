@@ -71,10 +71,14 @@ export const flightSchedule = () => {
       this.showLoadingAnimation();
       this.setActiveFilter(this.currentFilterKey);
 
+      const firstFilter = this.filters[0]; // Select the first filter
+      const glyphSquare = firstFilter.querySelector('.glyph_square') as HTMLElement;
+      glyphSquare.classList.add('has-stroke');
+
       this.parsedFlightData = this.parseData(this.flightData);
       // console.log('PARSED DATA', this.parsedFlightData);
       this.sortedFlightData = this.sortFlights(this.currentFilterKey);
-      console.log('SORTED DATA', this.sortedFlightData);
+      // console.log('SORTED DATA', this.sortedFlightData);
 
       const templates = document.querySelector('.sl_templates');
       gsap.set(templates, { display: 'none' });
