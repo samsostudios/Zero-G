@@ -101,22 +101,18 @@ export const flightSchedule = () => {
           item.querySelector('.sl_d-location.is-override')?.textContent?.trim() || '';
         const date = item.querySelector('.sl_d-date')?.textContent?.trim() || '';
         const time = item.querySelector('.sl_d-time')?.textContent?.trim() || '';
-        // const linkLocaion = location;
         const limitedSeatsElement = item.querySelector('.sl_d-limited');
         const soldOutElement = item.querySelector('.sl_d-sold');
         const type = item.querySelector('.sl_d-type')?.textContent?.trim() || '';
         const price = item.querySelector('.sl_d-price')?.textContent?.trim() || '';
         const colorElement = item.querySelector('.sl_d-color') as HTMLElement;
 
-        let link = '#';
-
         const dateObj = new Date(date);
         const month = dateObj.toLocaleString('default', { month: 'long' });
         const year = dateObj.getFullYear().toString();
+        const link = this.formatRowLink(location);
 
-        if (location !== '') {
-          link = this.formatRowLink(location);
-        } else {
+        if (location === '') {
           if (locationOverride === '') {
             location = 'Location - TBD';
           } else {
@@ -135,8 +131,6 @@ export const flightSchedule = () => {
             : false;
 
         const color = colorElement.style.backgroundColor as string;
-
-        // console.log('loc', location);
 
         return {
           month,
@@ -327,6 +321,13 @@ export const flightSchedule = () => {
           ? (colorElement.style.backgroundColor = flight.color)
           : (colorElement.style.backgroundColor = 'transparent');
         if (priceElement) priceElement.textContent = flight.price;
+        // if (linkElement) linkElement.href = flight.link;
+        if (linkElement) {
+          if (flight.type === 'Public Flights') linkElement.href = flight.link;
+          else if (flight.type === 'Private Flights') linkElement.href = '/private-flight-bookings';
+          else if (flight.type === 'Research Flights')
+            linkElement.href = '/research-flight-bookings';
+        }
 
         block.appendChild(row);
       });
@@ -334,6 +335,7 @@ export const flightSchedule = () => {
       return block;
     }
 
+    // Clear current UI elements
     private clearList() {
       this.flightsWrap.innerHTML = '';
       this.renderHeight = 0;
@@ -424,16 +426,24 @@ export const flightSchedule = () => {
         WY: 'wyoming',
       };
 
-      const [city, stateAbbr] = text.split(', ');
-      const formattedCity = city.toLowerCase().replace(/\s+/g, '-').replace(/\//g, '-');
-      const formattedState =
-        stateAbbr && stateAbbreviations[stateAbbr.toUpperCase()]
-          ? stateAbbreviations[stateAbbr.toUpperCase()]
-          : stateAbbr.toLowerCase();
+      let setLink = '';
 
-      // console.log('!!!!', formattedCity, formattedState);
+      if (text !== '') {
+        const [city, stateAbbr] = text.split(', ');
+        const formattedCity = city.toLowerCase().replace(/\s+/g, '-').replace(/\//g, '-');
+        const formattedState =
+          stateAbbr && stateAbbreviations[stateAbbr.toUpperCase()]
+            ? stateAbbreviations[stateAbbr.toUpperCase()]
+            : stateAbbr.toLowerCase();
 
-      return `/flight-locations/${formattedCity}-${formattedState}`;
+        // console.log('!!!!', formattedCity, formattedState);
+
+        setLink = `/flight-locations/${formattedCity}-${formattedState}`;
+      } else {
+        setLink = '#';
+      }
+
+      return setLink;
     }
 
     // Show loading animation
