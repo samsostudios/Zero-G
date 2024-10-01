@@ -34,6 +34,7 @@ window.Webflow.push(() => {
   initComponent('.section_flight-overview', () => import('$utils/revealVideos'));
   initComponent('.banner_component', () => import('$gComponents/crowdfundBanner'));
   initComponent('.section_featured-schedule', () => import('$gComponents/featuredFlights'));
+  initComponent('.section_featured-schedule', () => import('$utils/setDeepLinks'));
 
   // Page Routing
   // ------------

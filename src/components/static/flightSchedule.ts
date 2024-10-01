@@ -83,14 +83,12 @@ export const flightSchedule = () => {
       const templates = document.querySelector('.sl_templates');
       gsap.set(templates, { display: 'none' });
 
-      // this.setupFilterListeners();
-
       setTimeout(() => {
         this.renderUpdates();
         this.hideLoadingAnimation();
         this.setupFilterListeners();
-        // this.addModalCloseEvent();
-      }, 2000);
+        localStorage.removeItem('flightFilter');
+      }, 1500);
     }
 
     // Parse flight data from html feed
@@ -173,6 +171,10 @@ export const flightSchedule = () => {
 
             this.sortedFlightData = this.sortFlights(this.currentFilterKey);
             this.renderUpdates();
+
+            setTimeout(() => {
+              localStorage.removeItem('flightFilter');
+            }, 1000);
           });
         }
       });

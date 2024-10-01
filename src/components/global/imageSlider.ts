@@ -22,7 +22,6 @@ export const imageSlider = () => {
       this.tl = gsap.timeline();
 
       this.setupImages();
-      // this.initAnimation();
       this.setResize();
     }
 
@@ -36,7 +35,7 @@ export const imageSlider = () => {
           image.style.height = 'auto';
 
           requestAnimationFrame(() => {
-            console.log('img width', image.clientWidth);
+            // console.log('img width', image.clientWidth);
 
             this.totalWidth += image.clientWidth + 32;
             this.initAnimation();
@@ -46,11 +45,9 @@ export const imageSlider = () => {
     }
 
     private initAnimation() {
-      console.log('here', this.totalWidth, window.innerWidth);
       let dur = 0;
       this.isDev ? (dur = 5) : (dur = this.slideDuration);
 
-      console.log(dur);
       this.tl = gsap.timeline({ repeat: -1, yoyo: true });
       this.tl.to(this.imagesContainer, {
         x: `-${this.totalWidth - window.innerWidth}px`,
