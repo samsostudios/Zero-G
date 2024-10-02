@@ -26,7 +26,7 @@ window.Webflow.push(() => {
   initComponent('.section_faq', () => import('$gComponents/faq'));
   initComponent('.section_testimonials', () => import('$gComponents/testimonials'));
   initComponent('.section_img-slider', () => import('$gComponents/imageSlider'));
-  initComponent('.section_hs-form', () => import('$gComponents/hubspotForm'));
+  initComponent('.hs-form_main', () => import('$gComponents/hubspotForm'));
   initComponent('.section_featured-media', () => import('$gComponents/mediaPlayer'));
   initComponent('.section_home-flights', () => import('$gComponents/selectSlider'));
   initComponent('.section_brands', () => import('$gComponents/selectSlider'));
@@ -35,7 +35,7 @@ window.Webflow.push(() => {
   initComponent('.banner_component', () => import('$gComponents/crowdfundBanner'));
   initComponent('.section_featured-schedule', () => import('$gComponents/featuredFlights'));
   initComponent('.section_featured-schedule', () => import('$utils/setDeepLinks'));
-  initComponent('.section_newsletter', () => import('$gComponents/newsletter'));
+  // initComponent('.section_newsletter', () => import('$gComponents/newsletter'));
 
   // Page Routing
   // ------------

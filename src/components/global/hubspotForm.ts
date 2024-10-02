@@ -8,7 +8,6 @@ export const hubspotForm = () => {
   class HubSpotFormHandler {
     private form: HTMLFormElement;
     private portalID = '22411224';
-    // private formID = 'fa0bc0e2-d2af-496e-abde-61d430b0b733';
     private formID: string;
     constructor() {
       this.form = document.querySelector('.hs-form_form') as HTMLFormElement;
@@ -24,6 +23,7 @@ export const hubspotForm = () => {
       }
     }
 
+    // Validation
     private validateEmail(email: string): boolean {
       // console.log('VALIDATE');
       const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -35,19 +35,20 @@ export const hubspotForm = () => {
       return phonePattern.test(phone);
     }
 
+    // Form Parsing
     private collectFlightData(): Record<string, string> {
       const interestedIn =
         (document.querySelector("select[name='Interested-In']") as HTMLInputElement)?.value || '';
       const howCanWeHelp =
-        (document.querySelector("textarea[name='message']") as HTMLTextAreaElement)?.value || '';
+        (document.querySelector("textarea[name='Message']") as HTMLTextAreaElement)?.value || '';
       const firstName =
-        (document.querySelector("input[name='firstname']") as HTMLInputElement)?.value || '';
+        (document.querySelector("input[name='Firstname']") as HTMLInputElement)?.value || '';
       const lastName =
-        (document.querySelector("input[name='lastname']") as HTMLInputElement)?.value || '';
+        (document.querySelector("input[name='Lastname']") as HTMLInputElement)?.value || '';
       const email =
-        (document.querySelector("input[name='email']") as HTMLInputElement)?.value || '';
+        (document.querySelector("input[name='Email']") as HTMLInputElement)?.value || '';
       const phone =
-        (document.querySelector("input[name='phone']") as HTMLInputElement)?.value || '';
+        (document.querySelector("input[name='Phone']") as HTMLInputElement)?.value || '';
       const recaptchaToken =
         (document.querySelector('#g-recaptcha-response') as HTMLInputElement)?.value || '';
 
@@ -56,17 +57,6 @@ export const hubspotForm = () => {
         pageUrl: window.location.href,
         pageName: document.title,
       };
-
-      if (!this.validateEmail(email)) {
-        this.showErrorMessage('Please enter a valid email address.');
-        return {};
-      }
-      if (!this.validatePhoneNumber(phone)) {
-        this.showErrorMessage('Please enter a valid phone number (10-15 digits).');
-        return {};
-      }
-
-      // console.log('!!!', interestedIn, email);
 
       return {
         interested_in: interestedIn,
@@ -84,21 +74,21 @@ export const hubspotForm = () => {
       const interestedIn =
         (document.querySelector("select[name='Interested-In']") as HTMLInputElement)?.value || '';
       const location =
-        (document.querySelector("select[name='location']") as HTMLInputElement)?.value || '';
+        (document.querySelector("select[name='Location']") as HTMLInputElement)?.value || '';
       const howCanWeHelp =
-        (document.querySelector("textarea[name='message']") as HTMLTextAreaElement)?.value || '';
+        (document.querySelector("textarea[name='Message']") as HTMLTextAreaElement)?.value || '';
 
       const check = this.getSelectedCheckboxes('filters_check-icon');
       // console.log('****', check);
 
       const firstName =
-        (document.querySelector("input[name='firstname']") as HTMLInputElement)?.value || '';
+        (document.querySelector("input[name='Firstname']") as HTMLInputElement)?.value || '';
       const lastName =
-        (document.querySelector("input[name='lastname']") as HTMLInputElement)?.value || '';
+        (document.querySelector("input[name='Lastname']") as HTMLInputElement)?.value || '';
       const email =
-        (document.querySelector("input[name='email']") as HTMLInputElement)?.value || '';
+        (document.querySelector("input[name='Email']") as HTMLInputElement)?.value || '';
       const phone =
-        (document.querySelector("input[name='phone']") as HTMLInputElement)?.value || '';
+        (document.querySelector("input[name='Phone']") as HTMLInputElement)?.value || '';
       const recaptchaToken =
         (document.querySelector('#g-recaptcha-response') as HTMLInputElement)?.value || '';
 
@@ -135,19 +125,19 @@ export const hubspotForm = () => {
       const interestedIn =
         (document.querySelector("select[name='Interested-In']") as HTMLInputElement)?.value || '';
       const payload =
-        (document.querySelector("select[name='payload']") as HTMLInputElement)?.value || '';
+        (document.querySelector("select[name='Payload']") as HTMLInputElement)?.value || '';
       const howCanWeHelp =
-        (document.querySelector("textarea[name='message']") as HTMLTextAreaElement)?.value || '';
+        (document.querySelector("textarea[name='Message']") as HTMLTextAreaElement)?.value || '';
       const company =
-        (document.querySelector("input[name='company']") as HTMLInputElement)?.value || '';
+        (document.querySelector("input[name='Company']") as HTMLInputElement)?.value || '';
       const firstName =
-        (document.querySelector("input[name='firstname']") as HTMLInputElement)?.value || '';
+        (document.querySelector("input[name='Firstname']") as HTMLInputElement)?.value || '';
       const lastName =
-        (document.querySelector("input[name='lastname']") as HTMLInputElement)?.value || '';
+        (document.querySelector("input[name='Lastname']") as HTMLInputElement)?.value || '';
       const email =
-        (document.querySelector("input[name='email']") as HTMLInputElement)?.value || '';
+        (document.querySelector("input[name='Email']") as HTMLInputElement)?.value || '';
       const phone =
-        (document.querySelector("input[name='phone']") as HTMLInputElement)?.value || '';
+        (document.querySelector("input[name='Phone']") as HTMLInputElement)?.value || '';
       const recaptchaToken =
         (document.querySelector('#g-recaptcha-response') as HTMLInputElement)?.value || '';
 
@@ -180,37 +170,53 @@ export const hubspotForm = () => {
       };
     }
 
-    private getSelectedCheckboxes(className: string): string {
-      // Select all checkboxes with the given class
-      const checkboxes = [...document.querySelectorAll(`.${className}`)].map(
-        (item) => item as HTMLInputElement
-      );
+    // Main Form Logic
+    private handleSubmit(event: Event) {
+      event.preventDefault();
 
-      // console.log('?????', checkboxes);
+      let formData: Record<string, string> = {};
 
-      // Initialize an array to store the selected values
-      const selectedValues: string[] = [];
+      // Check if reCAPTCHA is completed
+      const recaptchaToken = (document.querySelector('#g-recaptcha-response') as HTMLInputElement)
+        ?.value;
 
-      // Loop through checkboxes and collect values of checked ones
-      checkboxes.forEach((checkbox: HTMLInputElement) => {
-        const checkVal = checkbox.nextElementSibling as HTMLInputElement;
-        // console.log('>>>>', checkVal);
-        if (checkVal.checked) {
-          // Assuming the label text is next to the checkbox
-          const parent = checkbox.parentElement as HTMLElement;
+      if (!recaptchaToken) {
+        alert('Please complete the reCAPTCHA.');
+        return;
+      }
 
-          const label = parent.querySelector('span')?.textContent?.trim();
-          // console.log('here', parent, label);
-          if (label) {
-            selectedValues.push(label);
-          }
-        }
-      });
+      // Check Email and Phone
+      const email =
+        (document.querySelector("input[name='Email']") as HTMLInputElement)?.value || '';
+      const phone =
+        (document.querySelector("input[name='Phone']") as HTMLInputElement)?.value || '';
 
-      // Join the selected values into a comma-separated string
-      return selectedValues.join(',');
+      if (!this.validateEmail(email)) {
+        this.showErrorMessage('Please enter a valid email address.');
+        return;
+      }
+
+      if (!this.validatePhoneNumber(phone)) {
+        this.showErrorMessage('Please enter a valid phone number (10-15 digits).');
+        return;
+      }
+
+      // Proceed with form submission after reCAPTCHA validation
+      const formAttr = this.form.dataset.name as string;
+      if (formAttr.includes('Private Charter Bookings')) {
+        formData = this.collectPrivatetData();
+      } else if (formAttr.includes('Research Charter Bookings')) {
+        formData = this.collectResearchtData();
+      } else {
+        formData = this.collectFlightData();
+      }
+
+      // console.log('Form Data:', formData);
+
+      this.sendDataToHubSpot(formData);
     }
 
+    // Send POST
     private async sendDataToHubSpot(data: Record<string, string>) {
       const hubSpotEndpoint = `https://forms.hubspot.com/uploads/form/v2/${this.portalID}/${this.formID}`;
 
@@ -243,41 +249,7 @@ export const hubspotForm = () => {
       }
     }
 
-    private handleSubmit(event: Event) {
-      event.preventDefault();
-
-      // Check if reCAPTCHA is completed
-      const recaptchaToken = (document.querySelector('#g-recaptcha-response') as HTMLInputElement)
-        ?.value;
-
-      if (!recaptchaToken) {
-        alert('Please complete the reCAPTCHA.');
-        return;
-      }
-
-      // Proceed with form submission after reCAPTCHA validation
-      const formAttr = this.form.dataset.name as string;
-      // console.log('!!!', formAttr, formAttr.includes('Research Flight Bookings'));
-      if (formAttr.includes('Private Charter Bookings')) {
-        // console.log('Private');
-        const formData = this.collectPrivatetData();
-        this.sendDataToHubSpot(formData);
-        // console.log('Form Data:', formData);
-      } else if (formAttr.includes('Research Charter Bookings')) {
-        // console.log('research');
-        const formData = this.collectResearchtData();
-        this.sendDataToHubSpot(formData);
-        // console.log('Form Data:', formData);
-      } else {
-        const formData = this.collectFlightData();
-        this.sendDataToHubSpot(formData);
-      }
-
-      // console.log('Form Data:', formData);
-
-      // this.sendDataToHubSpot(formData);
-    }
-
+    // UI Handlers
     private showSuccessMessage() {
       gsap.to('.hs-form_error', { opacity: 0, duration: 0.5 });
 
@@ -309,6 +281,38 @@ export const hubspotForm = () => {
         { opacity: 0, y: 20, display: 'none' },
         { opacity: 1, y: 0, display: 'block', duration: 1, ease: 'power2.out' }
       );
+    }
+
+    // Helpers
+    private getSelectedCheckboxes(className: string): string {
+      // Select all checkboxes with the given class
+      const checkboxes = [...document.querySelectorAll(`.${className}`)].map(
+        (item) => item as HTMLInputElement
+      );
+
+      // console.log('?????', checkboxes);
+
+      // Initialize an array to store the selected values
+      const selectedValues: string[] = [];
+
+      // Loop through checkboxes and collect values of checked ones
+      checkboxes.forEach((checkbox: HTMLInputElement) => {
+        const checkVal = checkbox.nextElementSibling as HTMLInputElement;
+        // console.log('>>>>', checkVal);
+        if (checkVal.checked) {
+          // Assuming the label text is next to the checkbox
+          const parent = checkbox.parentElement as HTMLElement;
+
+          const label = parent.querySelector('span')?.textContent?.trim();
+          // console.log('here', parent, label);
+          if (label) {
+            selectedValues.push(label);
+          }
+        }
+      });
+
+      // Join the selected values into a comma-separated string
+      return selectedValues.join(',');
     }
   }
 
