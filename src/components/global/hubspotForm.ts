@@ -18,7 +18,6 @@ export const hubspotForm = () => {
     private bindEvents() {
       if (this.form) {
         this.formID = this.form.getAttribute('data-hs-form') as string;
-        console.log('!!!', this.portalID, this.formID);
         this.form.addEventListener('submit', (event) => this.handleSubmit(event));
       }
     }
