@@ -47,7 +47,12 @@ export const newsletter = () => {
 
     // UI Handlers
     private showSuccessMessage() {
-      gsap.to('.hs-form_error', { opacity: 0, duration: 0.5 });
+      const formParent = this.form.parentElement as HTMLElement;
+      const success = formParent.querySelector('.news-form_success');
+      const error = formParent.querySelector('.news-form_error');
+
+      // reset error
+      gsap.to(error, { opacity: 0, duration: 0.5 });
 
       gsap.to(this.form, {
         opacity: 0,
@@ -60,14 +65,15 @@ export const newsletter = () => {
       });
 
       gsap.fromTo(
-        '.hs-form_success',
+        success,
         { opacity: 0, y: 20, display: 'none' },
         { opacity: 1, y: 0, display: 'block', duration: 1, ease: 'power2.out' }
       );
     }
 
     private showErrorMessage(text: string) {
-      const errorContainer = document.querySelector('.hs-form_error') as HTMLElement;
+      const formParent = this.form.parentElement as HTMLElement;
+      const errorContainer = formParent.querySelector('.hs-form_error') as HTMLElement;
       const errorText = errorContainer.querySelector('p') as HTMLElement;
 
       errorText.innerHTML = text;
