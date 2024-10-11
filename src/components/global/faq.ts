@@ -3,16 +3,10 @@ import { gsap } from 'gsap';
 export const faq = () => {
   // console.log('FAQ  - COMP');
   class FAQ {
-    // private faqList: HTMLElement;
     private faqList: HTMLElement[];
-    // private faqItems: HTMLElement[];
 
     constructor() {
-      // this.faqList = document.querySelector('.faq_list') as HTMLElement;
       this.faqList = [...document.querySelectorAll('.faq_item')].map((item) => item as HTMLElement);
-      // this.faqItems = [...this.faqList.querySelectorAll('.faq_item')].map(
-      //   (item) => item as HTMLElement
-      // );
       this.init();
     }
 

@@ -36,8 +36,7 @@ window.Webflow.push(() => {
   initComponent('.section_featured-schedule', () => import('$gComponents/featuredFlights'));
   initComponent('.section_featured-schedule', () => import('$utils/setDeepLinks'));
   initComponent('.section_flash-sale', () => import('$gComponents/popupModal'));
-
-  // initComponent('.section_newsletter', () => import('$gComponents/newsletter'));
+  initComponent('.news-form_component', () => import('$gComponents/newsletter'));
 
   // Page Routing
   // ------------

@@ -27,7 +27,7 @@ export const crowdfundBanner = () => {
       const computedStyle = window.getComputedStyle(main);
       const paddingTop = parseFloat(computedStyle.padding);
 
-      console.log(paddingTop, reveal.clientHeight);
+      // console.log(paddingTop, reveal.clientHeight);
 
       this.inTimeline.to(mask, {
         height: reveal.clientHeight + paddingTop + paddingTop / 2,

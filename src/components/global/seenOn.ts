@@ -1,7 +1,7 @@
 import { gsap } from 'gsap';
 
 export const seenOn = () => {
-  console.log('Seen On - COMP');
+  // console.log('Seen On - COMP');
   class InfiniteSlider {
     private track: HTMLElement;
     private childWidth: number;

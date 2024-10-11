@@ -3,7 +3,7 @@ import { gsap } from 'gsap';
 declare const grecaptcha: any;
 
 export const hubspotForm = () => {
-  console.log('HS Form - C');
+  // console.log('HS Form - C');
 
   class HubSpotFormHandler {
     private form: HTMLFormElement;

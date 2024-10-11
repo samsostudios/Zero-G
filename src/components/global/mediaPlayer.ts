@@ -1,7 +1,7 @@
 import { gsap } from 'gsap';
 
 export const mediaPlayer = () => {
-  console.log('Media Player - COMP');
+  // console.log('Media Player - COMP');
 
   class MediaPlayer {
     private mediaItems: HTMLElement[];

@@ -1,3 +1,5 @@
+import { gsap } from 'gsap';
+
 export const newsletter = () => {
   class Newsletter {
     private form: HTMLFormElement;
@@ -9,40 +11,72 @@ export const newsletter = () => {
     }
 
     private setListeners() {
-      console.log('NEWSLETTER');
+      // console.log('NEWSLETTER');
       this.form.addEventListener('submit', (e) => {
         e.preventDefault();
 
-        const email = this.form.querySelector('input') as HTMLInputElement;
-        const value = email.value as string;
-
-        console.log('VAL', this.form, email, value);
-
+        const input = this.form.querySelector('input[name="Email"]') as HTMLInputElement;
+        const value = input.value as string;
         const listId = 'RKV9bY';
-        const apiKey = 'Sb5qUW';
 
-        // Send the form data via Ajax (fetch)
         fetch(`https://manage.kmail-lists.com/ajax/subscriptions/subscribe`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
           },
-          body: `g=${listId}&email=${email}`,
+          body: `g=${listId}&email=${value}`,
         })
-          .then((response) => {
-            if (response.ok) {
-              // Show success message without redirecting
-              alert('Thank you for subscribing!');
+          .then((response) => response.json())
+          .then((data) => {
+            // console.log('DATA', data);
+            if (data.success) {
+              this.showSuccessMessage();
             } else {
-              // Handle error response
-              alert('There was an error. Please try again.');
+              console.log(
+                'Error: ' + (data.errors.length ? data.errors[0].message : 'Unknown error')
+              );
+              this.showErrorMessage(data.errors.length ? data.errors[0].message : 'Unknown error');
             }
           })
           .catch((error) => {
             console.error('Error:', error);
-            alert('There was a problem submitting the form.');
+            this.showErrorMessage(error);
           });
       });
+    }
+
+    // UI Handlers
+    private showSuccessMessage() {
+      gsap.to('.hs-form_error', { opacity: 0, duration: 0.5 });
+
+      gsap.to(this.form, {
+        opacity: 0,
+        height: 0,
+        duration: 0.5,
+        ease: 'power2.out',
+        onComplete: () => {
+          gsap.set(this.form, { display: 'none' });
+        },
+      });
+
+      gsap.fromTo(
+        '.hs-form_success',
+        { opacity: 0, y: 20, display: 'none' },
+        { opacity: 1, y: 0, display: 'block', duration: 1, ease: 'power2.out' }
+      );
+    }
+
+    private showErrorMessage(text: string) {
+      const errorContainer = document.querySelector('.hs-form_error') as HTMLElement;
+      const errorText = errorContainer.querySelector('p') as HTMLElement;
+
+      errorText.innerHTML = text;
+
+      gsap.fromTo(
+        errorContainer,
+        { opacity: 0, y: 20, display: 'none' },
+        { opacity: 1, y: 0, display: 'block', duration: 1, ease: 'power2.out' }
+      );
     }
   }
   new Newsletter();
