@@ -48,11 +48,13 @@ export const popupModal = () => {
     }
 
     private animateBanner() {
+      const speed = 50;
       const calcWidth = this.calculateRenderWidth();
       const setWidth = calcWidth - window.innerWidth;
+      const setSpeed = setWidth / speed;
 
       const tl = gsap.timeline({ repeat: -1, yoyo: true });
-      tl.to(this.flashTrack, { duration: 10, x: -setWidth, ease: 'linear' });
+      tl.to(this.flashTrack, { duration: setSpeed, x: -setWidth, ease: 'linear' });
 
       //   console.log('here!!!', calcWidth);
     }

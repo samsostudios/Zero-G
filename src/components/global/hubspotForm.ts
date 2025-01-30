@@ -9,6 +9,7 @@ export const hubspotForm = () => {
     private portalID = '22411224';
     private formID: string;
     constructor() {
+      console.log('HS Form');
       this.form = document.querySelector('.hs-form_form') as HTMLFormElement;
       this.formID = '';
       this.bindEvents();
