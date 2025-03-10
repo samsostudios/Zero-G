@@ -39,21 +39,70 @@ export const cookieConsent = () => {
       }
     }
 
-    private enableTracking() {}
+    private enableTracking() {
+      // console.log('enable tracking');
 
-    private disableTracking() {}
+      // Google Analytics
+      const gaScript = document.createElement('script');
+      gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-720WB0BGQ2';
+      gaScript.async = true;
+      document.head.appendChild(gaScript);
+
+      gaScript.onload = () => {
+        (window as any).dataLayer = (window as any).dataLayer || [];
+        function gtag(...args: any[]) {
+          (window as any).dataLayer.push(args);
+        }
+        gtag('js', new Date());
+        gtag('config', 'G-720WB0BGQ2');
+      };
+
+      // Microsoft Clarity
+      const clarity = document.createElement('script');
+      clarity.innerHTML = `
+        (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/omre5evj7v";
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "omre5evj7v");
+      `;
+      document.head.appendChild(clarity);
+
+      // HubSpot
+      const hubspot = document.createElement('script');
+      hubspot.src = '//js.hs-scripts.com/22411224.js';
+      hubspot.id = 'hs-script-loader';
+      hubspot.async = true;
+      hubspot.defer = true;
+      document.head.appendChild(hubspot);
+    }
+
+    private disableTracking() {
+      // console.log('disable tracking');
+
+      document.querySelector('#hs-script-loader')?.remove();
+      document.querySelector("script[src*='clarity.ms']")?.remove();
+      document.querySelector("script[src*='googletagmanager.com']")?.remove();
+
+      // Clear existing cookies
+      document.cookie.split(';').forEach((cookie) => {
+        document.cookie = cookie
+          .replace(/^ +/, '')
+          .replace(/=.*/, '=;expires=' + new Date(0).toUTCString() + ';path=/');
+      });
+    }
 
     private revealConsent() {
-      const tl = gsap.timeline({ delay: 2 });
+      const tl = gsap.timeline({ delay: 1 });
       tl.fromTo(
         this.component,
         { opacity: 0, y: '2vh', display: 'none' },
-        { duratation: 2, y: '0vh', opacity: 1, display: 'block', ease: 'power1.out' }
+        { duration: 2, y: '0vh', opacity: 1, display: 'block', ease: 'power1.out' }
       );
     }
 
     private removeConsent() {
-      const tl = gsap.timeline({ delay: 2 });
+      const tl = gsap.timeline();
       tl.to(this.component, { opacity: 0, y: '2vh', display: 'power1.out' });
     }
   }

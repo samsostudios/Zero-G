@@ -34,11 +34,23 @@ if (PRODUCTION) {
 
 // Watch and serve files in dev
 else {
-  await context.watch();
   await context
     .serve({
       servedir: BUILD_DIRECTORY,
       port: SERVE_PORT,
+      onRequest: (req, res) => {
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+        // Special headers for EventSource to prevent CORS errors in live-reload
+        if (req.url.includes('/esbuild')) {
+          res.setHeader('Content-Type', 'text/event-stream');
+          res.setHeader('Cache-Control', 'no-cache');
+          res.setHeader('Connection', 'keep-alive');
+        }
+      },
     })
     .then(async ({ port }) => {
       // Log all served files for easy reference

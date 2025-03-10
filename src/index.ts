@@ -5,9 +5,9 @@ window.Webflow ||= [];
 window.Webflow.push(() => {
   console.log('🌐 Zero-G 🌐');
 
-  document.addEventListener('click', (e) => {
-    console.log('YO', e.target);
-  });
+  // document.addEventListener('click', (e) => {
+  //   console.log('YO', e.target);
+  // });
 
   // Global Components
   // ----------------

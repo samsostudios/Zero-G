@@ -1,3 +1,5 @@
-new EventSource(`http://localhost:${SERVE_PORT}/esbuild`).addEventListener('change', () =>
-  location.reload()
-);
+if (window.location.hostname === 'localhost') {
+  new EventSource(`http://localhost:${SERVE_PORT}`).addEventListener('change', () =>
+    location.reload()
+  );
+}
