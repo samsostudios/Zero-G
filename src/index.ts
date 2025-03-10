@@ -3,7 +3,7 @@ import { schedule } from '$pages/schedule';
 
 window.Webflow ||= [];
 window.Webflow.push(() => {
-  console.log('/// mainJS ///');
+  console.log('🌐 Zero-G 🌐');
 
   document.addEventListener('click', (e) => {
     console.log('YO', e.target);
@@ -37,6 +37,7 @@ window.Webflow.push(() => {
   initComponent('.section_featured-schedule', () => import('$utils/setDeepLinks'));
   initComponent('.section_flash-sale', () => import('$gComponents/popupModal'));
   initComponent('.news-form_component', () => import('$gComponents/newsletter'));
+  initComponent('.cookies_component', () => import('$utils/cookieConsent'));
 
   // Page Routing
   // ------------

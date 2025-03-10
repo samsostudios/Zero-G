@@ -3,7 +3,7 @@ import { blogSlider } from '$sComponents/blogSlider';
 import { revealVideo } from '$utils/revealVideos';
 
 export const home = () => {
-  console.log('/home');
+  // console.log('/home');
 
   // featuredFlights();
   blogSlider();

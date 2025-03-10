@@ -1,3 +1,5 @@
+import { gsap } from 'gsap';
+
 export const cookieConsent = () => {
   class CookieConsent {
     private component: HTMLElement;
@@ -17,23 +19,43 @@ export const cookieConsent = () => {
       if (!this.component) return;
 
       //check contsent status
-      const consent = localStorage.getItem(this.consentKey);
-      if (!consent) {
-        console.log('consent not found');
-      } else if (consent === 'accepted') {
-        console.log('consent found');
+      if (!localStorage.getItem(this.consentKey)) {
+        this.revealConsent();
       }
 
       //Event listeners
-      this.accept.addEventListener('click', () => {});
-      this.decline.addEventListener('click', () => {});
+      this.accept.addEventListener('click', () => this.setConsent('accepted'));
+      this.decline.addEventListener('click', () => this.setConsent('declined'));
     }
 
-    private setConsent() {}
+    private setConsent(status: 'accepted' | 'declined') {
+      localStorage.setItem(this.consentKey, status);
+      this.removeConsent();
+
+      if (status === 'accepted') {
+        this.enableTracking();
+      } else {
+        this.disableTracking();
+      }
+    }
 
     private enableTracking() {}
 
     private disableTracking() {}
+
+    private revealConsent() {
+      const tl = gsap.timeline({ delay: 2 });
+      tl.fromTo(
+        this.component,
+        { opacity: 0, y: '2vh', display: 'none' },
+        { duratation: 2, y: '0vh', opacity: 1, display: 'block', ease: 'power1.out' }
+      );
+    }
+
+    private removeConsent() {
+      const tl = gsap.timeline({ delay: 2 });
+      tl.to(this.component, { opacity: 0, y: '2vh', display: 'power1.out' });
+    }
   }
 
   new CookieConsent();

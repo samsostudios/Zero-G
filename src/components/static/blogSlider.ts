@@ -1,7 +1,7 @@
 import gsap from 'gsap';
 
 export const blogSlider = () => {
-  console.log('Blog - COMP');
+  // console.log('Blog - COMP');
 
   class BlogSlider {
     private blogList: HTMLElement;
