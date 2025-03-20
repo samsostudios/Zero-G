@@ -10,11 +10,12 @@ export const revealVideo = () => {
     private scrollTrigger;
 
     constructor() {
-      this.triggerElement = document.querySelector('[data-overview-trigger]') as HTMLElement;
-
+      this.triggerElement = document.querySelector('[data-overview-component]') as HTMLElement;
       this.videoElements = [...this.triggerElement.querySelectorAll('video')].map(
         (item) => item as HTMLVideoElement
       );
+
+      if (this.videoElements === null) return;
 
       if (this.videoElements.length !== 0) {
         this.scrollTrigger = ScrollTrigger.create({

@@ -28,21 +28,21 @@ export const nav = () => {
       ScrollTrigger.create({
         trigger: this.heroElement,
         start: 'top+=10% top ',
-        end: 'top top',
+        end: 'top+=10% top',
         scrub: true,
         onEnter: () => this.animateNavBgIn(),
         onLeaveBack: () => this.animateNavBgOut(),
         // onUpdate: (self) => this.handleScroll(self.progress),
-        // markers: true,
+        // markers: true
       });
     }
 
     private animateNavBgIn(): void {
-      gsap.to(this.navBg, { y: '0%', opacity: 1, duration: 1, ease: 'power3.out' });
+      gsap.to(this.navBg, { y: '0%', duration: 1, ease: this.easeFloat });
     }
 
     private animateNavBgOut(): void {
-      gsap.to(this.navBg, { y: '-100%', opacity: 0, duration: 1, ease: 'power3.in' });
+      gsap.to(this.navBg, { y: '-100%', duration: 1, ease: this.easeFloat });
     }
   }
 

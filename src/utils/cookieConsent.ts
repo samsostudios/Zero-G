@@ -25,23 +25,21 @@ export const cookieConsent = () => {
 
       //Event listeners
       this.accept.addEventListener('click', () => this.setConsent('accepted'));
-      this.decline.addEventListener('click', () => this.setConsent('declined'));
+      // this.decline.addEventListener('click', () => this.setConsent('declined'));
     }
 
     private setConsent(status: 'accepted' | 'declined') {
       localStorage.setItem(this.consentKey, status);
       this.removeConsent();
 
-      if (status === 'accepted') {
-        this.enableTracking();
-      } else {
-        this.disableTracking();
-      }
+      // if (status === 'accepted') {
+      //   this.enableTracking();
+      // } else {
+      //   this.disableTracking();
+      // }
     }
 
     private enableTracking() {
-      // console.log('enable tracking');
-
       // Google Analytics
       const gaScript = document.createElement('script');
       gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-720WB0BGQ2';
@@ -78,8 +76,6 @@ export const cookieConsent = () => {
     }
 
     private disableTracking() {
-      // console.log('disable tracking');
-
       document.querySelector('#hs-script-loader')?.remove();
       document.querySelector("script[src*='clarity.ms']")?.remove();
       document.querySelector("script[src*='googletagmanager.com']")?.remove();
@@ -96,8 +92,8 @@ export const cookieConsent = () => {
       const tl = gsap.timeline({ delay: 1 });
       tl.fromTo(
         this.component,
-        { opacity: 0, y: '2vh', display: 'none' },
-        { duration: 2, y: '0vh', opacity: 1, display: 'block', ease: 'power1.out' }
+        { opacity: 0, y: '-1rem', display: 'none' },
+        { duration: 1, y: '0rem', opacity: 1, display: 'block', ease: 'power2.out' }
       );
     }
 
