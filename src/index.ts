@@ -54,8 +54,4 @@ window.Webflow.push(() => {
   }
 
   loadPageModules();
-
-  //  else if (windowLocation.includes('/about')) {
-  //   about();
-  // }
 });

@@ -172,6 +172,7 @@ export const hubspotForm = () => {
     // Main Form Logic
     private handleSubmit(event: Event) {
       event.preventDefault();
+      event.stopPropagation();
 
       let formData: Record<string, string> = {};
 
