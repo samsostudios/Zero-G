@@ -14,6 +14,7 @@ export const newsletter = () => {
       // console.log('NEWSLETTER');
       this.form.addEventListener('submit', (e) => {
         e.preventDefault();
+        e.stopPropagation();
 
         const input = this.form.querySelector('input[name="Email"]') as HTMLInputElement;
         const value = input.value as string;
