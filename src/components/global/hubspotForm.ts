@@ -8,10 +8,12 @@ export const hubspotForm = () => {
     private form: HTMLFormElement;
     private portalID = '22411224';
     private formID: string;
+    private honeyCheck: string;
     constructor() {
       // console.log('HS Form');
       this.form = document.querySelector('.hs-form_form') as HTMLFormElement;
       this.formID = '';
+      this.honeyCheck = 'false';
       this.bindEvents();
     }
 
@@ -23,19 +25,35 @@ export const hubspotForm = () => {
     }
 
     // Validation
-    private validateEmail(email: string): boolean {
+    private validateEmail(): boolean {
       // console.log('VALIDATE');
+      const email =
+        (document.querySelector("input[name='Email']") as HTMLInputElement)?.value || '';
       const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       return emailPattern.test(email);
     }
 
-    private validatePhoneNumber(phone: string): boolean {
+    private validatePhoneNumber(): boolean {
+      const phone =
+        (document.querySelector("input[name='Phone']") as HTMLInputElement)?.value || '';
       const phonePattern = /^\d{10,15}$/; // Allow phone numbers with 10 to 15 digits
+      console.log('PHONE!!!', phonePattern.test(phone));
       return phonePattern.test(phone);
+    }
+
+    private validateHoney(): boolean {
+      const emailConf =
+        (document.querySelector("input[name='Email-Confirm']") as HTMLInputElement)?.value || '';
+      console.log('HONEY!!!', emailConf.trim() === '');
+      const check = emailConf.trim() === '';
+      this.honeyCheck = String(check);
+
+      return check;
     }
 
     // Form Parsing
     private collectFlightData(): Record<string, string> {
+      console.log('collect data - Contact');
       const interestedIn =
         (document.querySelector("select[name='Interested-In']") as HTMLInputElement)?.value || '';
       const howCanWeHelp =
@@ -48,8 +66,10 @@ export const hubspotForm = () => {
         (document.querySelector("input[name='Email']") as HTMLInputElement)?.value || '';
       const phone =
         (document.querySelector("input[name='Phone']") as HTMLInputElement)?.value || '';
-      const recaptchaToken =
-        (document.querySelector('#g-recaptcha-response') as HTMLInputElement)?.value || '';
+      // const emailConf =
+      //   (document.querySelector("input[name='Email-Confirm']") as HTMLInputElement)?.value || '';
+      // const recaptchaToken =
+      //   (document.querySelector('#g-recaptcha-response') as HTMLInputElement)?.value || '';
 
       const hsContext = {
         hutk: '',
@@ -64,7 +84,8 @@ export const hubspotForm = () => {
         lastname: lastName,
         email: email,
         phone: phone,
-        'g-recaptcha-response': recaptchaToken,
+        honeypotPassed: this.honeyCheck,
+        // 'g-recaptcha-response': recaptchaToken,
         hs_context: JSON.stringify(hsContext),
       };
     }
@@ -97,11 +118,11 @@ export const hubspotForm = () => {
         pageName: document.title,
       };
 
-      if (!this.validateEmail(email)) {
+      if (!this.validateEmail()) {
         this.showErrorMessage('Please enter a valid email address.');
         return {};
       }
-      if (!this.validatePhoneNumber(phone)) {
+      if (!this.validatePhoneNumber()) {
         this.showErrorMessage('Please enter a valid phone number (10-15 digits).');
         return {};
       }
@@ -146,11 +167,11 @@ export const hubspotForm = () => {
         pageName: document.title,
       };
 
-      if (!this.validateEmail(email)) {
+      if (!this.validateEmail()) {
         this.showErrorMessage('Please enter a valid email address.');
         return {};
       }
-      if (!this.validatePhoneNumber(phone)) {
+      if (!this.validatePhoneNumber()) {
         this.showErrorMessage('Please enter a valid phone number (10-15 digits).');
         return {};
       }
@@ -171,32 +192,35 @@ export const hubspotForm = () => {
 
     // Main Form Logic
     private handleSubmit(event: Event) {
+      if (!this.validateHoney()) {
+        this.showErrorMessage('Something went wrong! Please try again later.');
+        //Send spam submission to API
+        // this.form.removeEventListener('submit', this.handleSubmit);
+        // this.form.submit();
+        return;
+      }
+
       event.preventDefault();
       event.stopPropagation();
 
       let formData: Record<string, string> = {};
 
       // Check if reCAPTCHA is completed
-      const recaptchaToken = (document.querySelector('#g-recaptcha-response') as HTMLInputElement)
-        ?.value;
+      // const recaptchaToken = (document.querySelector('#g-recaptcha-response') as HTMLInputElement)
+      //   ?.value;
 
-      if (!recaptchaToken) {
-        alert('Please complete the reCAPTCHA.');
-        return;
-      }
+      // if (!recaptchaToken) {
+      //   alert('Please complete the reCAPTCHA.');
+      //   return;
+      // }
 
-      // Check Email and Phone
-      const email =
-        (document.querySelector("input[name='Email']") as HTMLInputElement)?.value || '';
-      const phone =
-        (document.querySelector("input[name='Phone']") as HTMLInputElement)?.value || '';
-
-      if (!this.validateEmail(email)) {
+      // Form Validation
+      if (!this.validateEmail()) {
         this.showErrorMessage('Please enter a valid email address.');
         return;
       }
 
-      if (!this.validatePhoneNumber(phone)) {
+      if (!this.validatePhoneNumber()) {
         this.showErrorMessage('Please enter a valid phone number (10-15 digits).');
         return;
       }
@@ -211,7 +235,7 @@ export const hubspotForm = () => {
         formData = this.collectFlightData();
       }
 
-      // console.log('Form Data:', formData);
+      console.log('Form Data!!!!', formData);
 
       this.sendDataToHubSpot(formData);
     }
