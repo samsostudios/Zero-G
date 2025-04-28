@@ -89,7 +89,7 @@ export const hubspotForm = () => {
           (document.querySelector("input[name='Company']") as HTMLInputElement)?.value || '';
 
         testData.research__charter_or_mixed_payload = interestedIn;
-        testData.mixed_payload__spring_or_summer_s = payload;
+        testData.mixed_payload__spring_or_summer_ = payload;
         testData.company = company;
       }
 
@@ -214,22 +214,14 @@ export const hubspotForm = () => {
       const checkboxes = [...document.querySelectorAll(`.${className}`)].map(
         (item) => item as HTMLInputElement
       );
-
-      // console.log('?????', checkboxes);
-
-      // Initialize an array to store the selected values
       const selectedValues: string[] = [];
 
       // Loop through checkboxes and collect values of checked ones
       checkboxes.forEach((checkbox: HTMLInputElement) => {
         const checkVal = checkbox.nextElementSibling as HTMLInputElement;
-        // console.log('>>>>', checkVal);
         if (checkVal.checked) {
-          // Assuming the label text is next to the checkbox
           const parent = checkbox.parentElement as HTMLElement;
-
           const label = parent.querySelector('span')?.textContent?.trim();
-          // console.log('here', parent, label);
           if (label) {
             selectedValues.push(label);
           }
@@ -237,7 +229,7 @@ export const hubspotForm = () => {
       });
 
       // Join the selected values into a comma-separated string
-      return selectedValues.join(',');
+      return selectedValues.join(';');
     }
   }
 
