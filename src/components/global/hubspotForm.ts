@@ -1,7 +1,5 @@
 import { gsap } from 'gsap';
 
-declare const grecaptcha: any;
-
 export const hubspotForm = () => {
   // console.log('HS Form - C');
   class HubSpotFormHandler {
@@ -10,7 +8,6 @@ export const hubspotForm = () => {
     private formID: string;
     private honeyCheck: string;
     constructor() {
-      // console.log('HS Form');
       this.form = document.querySelector('.hs-form_form') as HTMLFormElement;
       this.formID = '';
       this.honeyCheck = 'false';
@@ -26,7 +23,6 @@ export const hubspotForm = () => {
 
     // Validation
     private validateEmail(): boolean {
-      // console.log('VALIDATE');
       const email =
         (document.querySelector("input[name='Email']") as HTMLInputElement)?.value || '';
       const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -37,14 +33,12 @@ export const hubspotForm = () => {
       const phone =
         (document.querySelector("input[name='Phone']") as HTMLInputElement)?.value || '';
       const phonePattern = /^\d{10,15}$/; // Allow phone numbers with 10 to 15 digits
-      console.log('PHONE!!!', phonePattern.test(phone));
       return phonePattern.test(phone);
     }
 
     private validateHoney(): boolean {
       const emailConf =
         (document.querySelector("input[name='Email-Confirm']") as HTMLInputElement)?.value || '';
-      console.log('HONEY!!!', emailConf.trim() === '');
       const check = emailConf.trim() === '';
       this.honeyCheck = String(check);
 
@@ -53,8 +47,6 @@ export const hubspotForm = () => {
 
     // Form Parsing
     private collectContactData(match: string): Record<string, string> {
-      console.log('COLLECT!!');
-
       const firstName =
         (document.querySelector("input[name='Firstname']") as HTMLInputElement)?.value || '';
       const lastName =
@@ -69,11 +61,6 @@ export const hubspotForm = () => {
       const howCanWeHelp =
         (document.querySelector("textarea[name='Message']") as HTMLTextAreaElement)?.value || '';
 
-      // const emailConf =
-      //   (document.querySelector("input[name='Email-Confirm']") as HTMLInputElement)?.value || '';
-      // const recaptchaToken =
-      //   (document.querySelector('#g-recaptcha-response') as HTMLInputElement)?.value || '';
-
       const testData: Record<string, any> = {
         firstName: firstName,
         lastName: lastName,
@@ -82,13 +69,11 @@ export const hubspotForm = () => {
         how_can_we_help: howCanWeHelp,
       };
 
-      console.log('BASE DATA:', testData);
-
       if (match === 'General') {
-        console.log('General', match);
+        // console.log('General', match);
         testData.interested_in = interestedIn;
       } else if (match === 'Private') {
-        console.log('Private', match);
+        // console.log('Private', match);
         const location =
           (document.querySelector("select[name='Location']") as HTMLInputElement)?.value || '';
         const check = this.getSelectedCheckboxes('filters_check-icon');
@@ -97,8 +82,7 @@ export const hubspotForm = () => {
         testData.flight_locations = location;
         testData.optional_add_ons__charters_ = check;
       } else if (match === 'Research') {
-        console.log('Research', match);
-
+        // console.log('Research', match);
         const payload =
           (document.querySelector("select[name='Payload']") as HTMLInputElement)?.value || '';
         const company =
@@ -117,126 +101,7 @@ export const hubspotForm = () => {
 
       testData.hs_context = JSON.stringify(hsContext);
 
-      console.log('RETURN', testData);
-
       return testData;
-      // return {
-      //   firstname: firstName,
-      //   lastname: lastName,
-      //   email: email,
-      //   phone: phone,
-
-      //   interested_in: interestedIn,
-      //   how_can_we_help: howCanWeHelp,
-
-      //   // honeypotPassed: this.honeyCheck,
-      //   // 'g-recaptcha-response': recaptchaToken,
-      //   hs_context: JSON.stringify(hsContext),
-      // };
-    }
-
-    private collectPrivatetData(): Record<string, string> {
-      const firstName =
-        (document.querySelector("input[name='Firstname']") as HTMLInputElement)?.value || '';
-      const lastName =
-        (document.querySelector("input[name='Lastname']") as HTMLInputElement)?.value || '';
-      const email =
-        (document.querySelector("input[name='Email']") as HTMLInputElement)?.value || '';
-      const phone =
-        (document.querySelector("input[name='Phone']") as HTMLInputElement)?.value || '';
-
-      const interestedIn =
-        (document.querySelector("select[name='Interested-In']") as HTMLInputElement)?.value || '';
-      const howCanWeHelp =
-        (document.querySelector("textarea[name='Message']") as HTMLTextAreaElement)?.value || '';
-
-      const location =
-        (document.querySelector("select[name='Location']") as HTMLInputElement)?.value || '';
-      const check = this.getSelectedCheckboxes('filters_check-icon');
-      // console.log('****', check);
-      // const recaptchaToken =
-      //   (document.querySelector('#g-recaptcha-response') as HTMLInputElement)?.value || '';
-
-      const hsContext = {
-        hutk: '',
-        pageUrl: window.location.href,
-        pageName: document.title,
-      };
-
-      if (!this.validateEmail()) {
-        this.showErrorMessage('Please enter a valid email address.');
-        return {};
-      }
-      if (!this.validatePhoneNumber()) {
-        this.showErrorMessage('Please enter a valid phone number (10-15 digits).');
-        return {};
-      }
-
-      return {
-        firstname: firstName,
-        lastname: lastName,
-        email: email,
-        phone: phone,
-
-        research__charter_or_mixed_payload: interestedIn,
-        how_can_we_help_: howCanWeHelp,
-        flight_locations: location,
-        optional_add_ons__charters_: check,
-        // 'g-recaptcha-response': recaptchaToken,
-        hs_context: JSON.stringify(hsContext),
-      };
-    }
-
-    private collectResearchtData(): Record<string, string> {
-      const firstName =
-        (document.querySelector("input[name='Firstname']") as HTMLInputElement)?.value || '';
-      const lastName =
-        (document.querySelector("input[name='Lastname']") as HTMLInputElement)?.value || '';
-      const email =
-        (document.querySelector("input[name='Email']") as HTMLInputElement)?.value || '';
-      const phone =
-        (document.querySelector("input[name='Phone']") as HTMLInputElement)?.value || '';
-
-      const interestedIn =
-        (document.querySelector("select[name='Interested-In']") as HTMLInputElement)?.value || '';
-      const howCanWeHelp =
-        (document.querySelector("textarea[name='Message']") as HTMLTextAreaElement)?.value || '';
-
-      const payload =
-        (document.querySelector("select[name='Payload']") as HTMLInputElement)?.value || '';
-      const company =
-        (document.querySelector("input[name='Company']") as HTMLInputElement)?.value || '';
-      // const recaptchaToken =
-      //   (document.querySelector('#g-recaptcha-response') as HTMLInputElement)?.value || '';
-
-      const hsContext = {
-        hutk: '',
-        pageUrl: window.location.href,
-        pageName: document.title,
-      };
-
-      if (!this.validateEmail()) {
-        this.showErrorMessage('Please enter a valid email address.');
-        return {};
-      }
-      if (!this.validatePhoneNumber()) {
-        this.showErrorMessage('Please enter a valid phone number (10-15 digits).');
-        return {};
-      }
-
-      return {
-        firstname: firstName,
-        lastname: lastName,
-        email: email,
-        phone: phone,
-
-        research__charter_or_mixed_payload: interestedIn,
-        how_can_we_help_: howCanWeHelp,
-        mixed_payload__spring_or_summer_s: payload,
-        company: company,
-        // 'g-recaptcha-response': recaptchaToken,
-        hs_context: JSON.stringify(hsContext),
-      };
     }
 
     // Main Form Logic
@@ -245,15 +110,6 @@ export const hubspotForm = () => {
       event.stopPropagation();
 
       let formData: Record<string, string> = {};
-
-      // Check if reCAPTCHA is completed
-      // const recaptchaToken = (document.querySelector('#g-recaptcha-response') as HTMLInputElement)
-      //   ?.value;
-
-      // if (!recaptchaToken) {
-      //   alert('Please complete the reCAPTCHA.');
-      //   return;
-      // }
 
       // Form Validation
       if (!this.validateEmail()) {
@@ -268,26 +124,13 @@ export const hubspotForm = () => {
 
       if (!this.validateHoney()) {
         this.showErrorMessage('Something went wrong! Please try again later.');
-        //Send spam submission to API
-        // this.form.removeEventListener('submit', this.handleSubmit);
-        // this.form.submit();
         return;
       }
 
       // Proceed with form submission after reCAPTCHA validation
       const formAttr = this.form.dataset.name as string;
       const matchForm = formAttr.split(' ')[0];
-      console.log('ATTR', formAttr.split(' ')[0]);
       formData = this.collectContactData(matchForm);
-      // if (formAttr.includes('Private Charter Bookings')) {
-      //   formData = this.collectContactData();
-      // } else if (formAttr.includes('Research Charter Bookings')) {
-      //   formData = this.collectResearchtData();
-      // } else {
-      //   formData = this.collectContactData();
-      // }
-
-      console.log('Form Data!!!!', formData);
 
       this.sendDataToHubSpot(formData);
     }
@@ -332,7 +175,7 @@ export const hubspotForm = () => {
       const error = formParent.querySelector('.hs-form_error');
 
       // reset error
-      gsap.to(error, { opacity: 0, duration: 0.5 });
+      gsap.to(error, { display: 'none', opacity: 0, duration: 0.5 });
 
       gsap.to(this.form, {
         opacity: 0,
