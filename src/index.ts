@@ -35,7 +35,7 @@ window.Webflow.push(() => {
   initComponent('.banner_component', () => import('$gComponents/crowdfundBanner'));
   initComponent('.section_featured-schedule', () => import('$gComponents/featuredFlights'));
   initComponent('.section_featured-schedule', () => import('$utils/setDeepLinks'));
-  initComponent('.section_flash-sale', () => import('$gComponents/popupModal'));
+  // initComponent('.section_flash-sale', () => import('$gComponents/popupModal'));
   initComponent('.news-form_component', () => import('$gComponents/newsletter'));
   initComponent('.cookies_component', () => import('$utils/cookieConsent'));
 
